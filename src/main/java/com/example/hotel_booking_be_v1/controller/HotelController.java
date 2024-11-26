@@ -33,6 +33,7 @@ public class HotelController {
         return ResponseEntity.ok(approvedHotel);
     }
 
+
     // Lấy danh sách các khách sạn của Rental
     @GetMapping("/rental/{ownerId}")
     @PreAuthorize("hasRole('ROLE_RENTAL')")
@@ -55,6 +56,13 @@ public class HotelController {
     public ResponseEntity<Void> deleteHotel(@PathVariable Long hotelId) {
         hotelService.deleteHotel(hotelId);
         return ResponseEntity.noContent().build();
+    }
+    // Admin từ chối Hotel
+    @PutMapping("/reject/{hotelId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Hotel> rejectHotel(@PathVariable Long hotelId) {
+        Hotel rejectedHotel = hotelService.rejectHotel(hotelId);
+        return ResponseEntity.ok(rejectedHotel);
     }
 }
 

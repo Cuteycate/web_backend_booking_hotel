@@ -14,6 +14,7 @@ public interface IHotelService {
     List<Hotel> getHotelsByOwner(Long ownerId);
 
     Hotel approveHotel(Long hotelId);
+    Hotel rejectHotel(Long hotelId);
 
     List<Hotel> getAllHotels();
 

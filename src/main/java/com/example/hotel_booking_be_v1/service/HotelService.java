@@ -47,6 +47,18 @@ public class HotelService implements IHotelService{
         hotel.setStatus("APPROVED");
         return hotelRepository.save(hotel);
     }
+    @Override
+    public Hotel rejectHotel(Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found"));
+
+        if ("REJECTED".equalsIgnoreCase(hotel.getStatus())) {
+            throw new IllegalStateException("Hotel is already rejected");
+        }
+
+        hotel.setStatus("REJECTED"); // Chuyển trạng thái sang REJECTED
+        return hotelRepository.save(hotel);
+    }
 
     @Override
     public List<Hotel> getAllHotels() {
