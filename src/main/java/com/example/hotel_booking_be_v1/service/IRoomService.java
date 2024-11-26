@@ -21,9 +21,11 @@ public interface IRoomService {
 
     void deleteRoom(long roomId);
 
-    Room updateRoom(Long roomId, String roomType, BigDecimal roomPrice, byte[] photoBytes);
+    Room updateRoom(Long roomId, String roomType, BigDecimal roomPrice, byte[] photoBytes)throws SQLException;
 
     Optional<Room> getRoomById(Long roomId);
 
     List<Room> getAvailabeRoom(LocalDate checkInDate, LocalDate checkOutDate, String roomType);
+
+    List<Room> getRoomsByHotel(Long hotelId);
 }

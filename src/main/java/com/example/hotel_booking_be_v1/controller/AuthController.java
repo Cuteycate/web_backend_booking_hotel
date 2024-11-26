@@ -39,7 +39,6 @@ public class AuthController {
 
         }catch (UserAlreadyExistsException e){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-
         }
     }
     @PostMapping("/login")
@@ -54,6 +53,62 @@ public class AuthController {
         return ResponseEntity.ok(new JwtResponse(
                 userDetails.getId(),
                 userDetails.getEmail(),jwt,roles
+        ));
+    }
+    @PostMapping("/admin-login")
+    public ResponseEntity<?> authenticatedAdmin(@Valid @RequestBody LoginRequest loginRequest){
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        HotelUserDetails userDetails = (HotelUserDetails) authentication.getPrincipal();
+
+        // Kiểm tra xem người dùng có phải là admin không
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Chỉ admin mới có quyền truy cập.");
+        }
+
+        // Tạo token nếu là admin
+        String jwt = jwtUtils.generateJwtTokenForUser(authentication);
+        List<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        return ResponseEntity.ok(new JwtResponse(
+                userDetails.getId(),
+                userDetails.getEmail(), jwt, roles
+        ));
+    }
+        @PostMapping("/login-rental")
+    public ResponseEntity<?> authenticatedRenter(@Valid @RequestBody LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        HotelUserDetails userDetails = (HotelUserDetails) authentication.getPrincipal();
+
+        // Kiểm tra nếu người dùng có vai trò "RENTAL"
+        boolean isRenter = userDetails.getAuthorities().stream()
+                .anyMatch(role -> role.getAuthority().equals("ROLE_RENTAL"));
+
+        if (!isRenter) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Chỉ rental mới có quyền truy cập.");
+        }
+
+        // Generate token if the user is a renter
+        String jwt = jwtUtils.generateJwtTokenForUser(authentication);
+        List<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        return ResponseEntity.ok(new JwtResponse(
+                userDetails.getId(),
+                userDetails.getEmail(), jwt, roles
         ));
     }
 

@@ -17,7 +17,10 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:5173"); // Allow your frontend origin
+        config.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5173", // Địa chỉ frontend đầu tiên
+                "http://localhost:5174"  // Địa chỉ frontend thứ hai hoặc port khác mà bạn cần
+        ));
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setMaxAge(3600L);

@@ -47,7 +47,7 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/rooms/**","/bookings/**")
+                        .requestMatchers("/auth/**", "/rooms/**","/bookings/**", "/login-rental")
                         .permitAll()
                         .requestMatchers("/roles/**")
                         .hasRole("ADMIN")
@@ -57,5 +57,6 @@ public class WebSecurityConfig {
         http.addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
 
 }

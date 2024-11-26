@@ -27,8 +27,12 @@ public class Room {
     @Lob
     private Blob photo;
 
-    @OneToMany(mappedBy="room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="room", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookedRoom> bookings;
+    //Hotel
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hotel_id") // Liên kết với Hotel
+    private Hotel hotel;
 
     public Room() {
         this.bookings = new ArrayList<>();
