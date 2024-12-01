@@ -19,7 +19,8 @@ public class CorsConfig {
         config.setAllowCredentials(true);
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173", // Địa chỉ frontend đầu tiên
-                "http://localhost:5174"  // Địa chỉ frontend thứ hai hoặc port khác mà bạn cần
+                "http://localhost:5174",  // Địa chỉ frontend thứ hai hoặc port khác mà bạn cần
+                "http://localhost:5175"
         ));
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
