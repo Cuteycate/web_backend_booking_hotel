@@ -2,6 +2,7 @@ package com.example.hotel_booking_be_v1.controller;
 
 import com.example.hotel_booking_be_v1.exception.ResourceNotFoundException;
 import com.example.hotel_booking_be_v1.model.Hotel;
+import com.example.hotel_booking_be_v1.model.HotelDTO;
 import com.example.hotel_booking_be_v1.model.Room;
 import com.example.hotel_booking_be_v1.model.User;
 import com.example.hotel_booking_be_v1.repository.UserRepository;
@@ -18,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +38,9 @@ public class HotelController {
     // Rental đăng ký Hotel mới
     @PostMapping("/register")
     @PreAuthorize("hasRole('ROLE_RENTAL')")
-    public ResponseEntity<Hotel> registerHotel(@RequestBody Hotel hotel, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<Hotel> registerHotel(@RequestBody HotelDTO hotelDTO, @AuthenticationPrincipal UserDetails userDetails) {
         String ownerEmail = userDetails.getUsername(); // Email lấy từ token
-        Hotel registeredHotel = hotelService.addHotel(hotel, ownerEmail);
+        Hotel registeredHotel = hotelService.addHotel(hotelDTO, ownerEmail);
         return ResponseEntity.status(HttpStatus.CREATED).body(registeredHotel);
     }
 
@@ -61,9 +63,10 @@ public class HotelController {
     // Lấy danh sách các Hotel của chủ sở hữu
     @GetMapping("/my-hotels")
     @PreAuthorize("hasRole('ROLE_RENTAL')")
-    public ResponseEntity<List<Hotel>> getMyHotels() {
-        List<Hotel> hotels = hotelService.getHotelsByOwner();
-        return ResponseEntity.ok(hotels);
+    public ResponseEntity<List<Hotel>> getMyHotels(@AuthenticationPrincipal UserDetails userDetails) {
+        String ownerEmail = userDetails.getUsername(); // Email lấy từ token
+        List<Hotel> hotels = hotelService.getHotelsByOwner(ownerEmail);
+        return ResponseEntity.ok(hotels.isEmpty() ? Collections.emptyList() : hotels);
     }
 
 

@@ -5,10 +5,13 @@ import com.example.hotel_booking_be_v1.model.*;
 import com.example.hotel_booking_be_v1.repository.HotelRepository;
 import com.example.hotel_booking_be_v1.repository.RoomRepository;
 import com.example.hotel_booking_be_v1.repository.UserRepository;
+import com.example.hotel_booking_be_v1.repository.WardRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,14 +22,28 @@ public class HotelService implements IHotelService {
     private final HotelRepository hotelRepository;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
+    private final WardRepository wardRepository;
 
     @Override
-    public Hotel addHotel(Hotel hotel, String ownerEmail) {
+    public Hotel addHotel(HotelDTO hotelDTO, String ownerEmail) {
         User owner = userRepository.findByEmail(ownerEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
 
+        // Tìm kiếm Ward từ database theo wardId
+        Ward ward = wardRepository.findById(hotelDTO.getWardId())
+                .orElseThrow(() -> new ResourceNotFoundException("Ward not found"));
+
+        // Chuyển DTO sang Entity
+        Hotel hotel = new Hotel();
+        hotel.setName(hotelDTO.getName());
+        hotel.setPhoneNumber(hotelDTO.getPhoneNumber());
+        hotel.setEmail(hotelDTO.getEmail());
+        hotel.setDescription(hotelDTO.getDescription());
+        hotel.setStreet(hotelDTO.getStreet());
+        hotel.setWard(ward); // Gán Ward vào Hotel
         hotel.setOwner(owner);
         hotel.setStatus("PENDING");
+
         return hotelRepository.save(hotel);
     }
 
@@ -45,20 +62,20 @@ public class HotelService implements IHotelService {
     }
 
     @Override
-    public List<Hotel> getHotelsByOwner() {
-        // Lấy thông tin user hiện tại
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username;
-
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
-        } else {
-            throw new IllegalStateException("Unable to retrieve user information");
-        }
-
-        User owner = userRepository.findByEmail(username)
+    public List<Hotel> getHotelsByOwner(String ownerEmail) {
+        // Tìm người dùng theo email
+        User owner = userRepository.findByEmail(ownerEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        // Kiểm tra xem người dùng có vai trò 'ROLE_RENTAL' không
+        boolean isRental = owner.getRoles().stream()
+                .anyMatch(role -> role.getName().equals("ROLE_RENTAL"));
+
+        if (!isRental) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a rental");
+        }
+
+        // Lấy danh sách khách sạn của người sở hữu
         return hotelRepository.findAllByOwnerId(owner.getId());
     }
     @Override

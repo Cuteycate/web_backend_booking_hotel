@@ -1,17 +1,18 @@
 package com.example.hotel_booking_be_v1.service;
 
 import com.example.hotel_booking_be_v1.model.Hotel;
+import com.example.hotel_booking_be_v1.model.HotelDTO;
 import com.example.hotel_booking_be_v1.model.Room;
 
 import java.util.List;
 import java.util.Optional;
 
     public interface IHotelService {
-        Hotel addHotel(Hotel hotel, String ownerEmail);
+        Hotel addHotel(HotelDTO hotelDTO, String ownerEmail);
 
     Optional<Hotel> getHotelById(Long hotelId);
 
-    List<Hotel> getHotelsByOwner();
+    List<Hotel> getHotelsByOwner(String ownerEmail);
 
     Hotel approveHotel(Long hotelId);
 
