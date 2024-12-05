@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +41,13 @@ public class Hotel {
     private Ward ward; // Liên kết với Ward
 
     private String street; // Địa chỉ chi tiết: số nhà, tên đường
+
+    @Lob
+    private Blob coverPhoto; // Hình ảnh đại diện
+
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private List<HotelPhoto> photos = new ArrayList<>(); // Danh sách ảnh khác
+
 
 
 }

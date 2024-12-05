@@ -38,30 +38,30 @@ public class RoomController {
     private final BookingService bookingService;
     private final HotelService hotelService;
 
-    @PostMapping("/add/new-room")
-    @PreAuthorize("hasRole('ROLE_RENTAL')")
-    public ResponseEntity<RoomResponse> addRoomToHotel(
-            @RequestParam Long hotelId,
-            @RequestParam("photo") MultipartFile photo,
-            @RequestParam("roomType") String roomType,
-            @RequestParam("roomPrice") BigDecimal roomPrice) throws IOException, SQLException {
-
-        Hotel hotel = hotelService.getHotelById(hotelId)
-                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found"));
-
-        if (!hotel.getStatus().equalsIgnoreCase("APPROVED")) {
-            throw new IllegalStateException("Cannot add room to a hotel that is not approved");
-        }
-
-        Room room = new Room();
-        room.setRoomType(roomType);
-        room.setRoomPrice(roomPrice);
-        room.setPhoto(new SerialBlob(photo.getBytes()));
-
-        Hotel updatedHotel = hotelService.addRoomToHotel(hotelId, room);
-        RoomResponse roomResponse = new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice());
-        return ResponseEntity.ok(roomResponse);
-    }
+//    @PostMapping("/add/new-room")
+//    @PreAuthorize("hasRole('ROLE_RENTAL')")
+//    public ResponseEntity<RoomResponse> addRoomToHotel(
+//            @RequestParam Long hotelId,
+//            @RequestParam("photo") MultipartFile photo,
+//            @RequestParam("roomType") String roomType,
+//            @RequestParam("roomPrice") BigDecimal roomPrice) throws IOException, SQLException {
+//
+//        Hotel hotel = hotelService.getHotelById(hotelId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found"));
+//
+//        if (!hotel.getStatus().equalsIgnoreCase("APPROVED")) {
+//            throw new IllegalStateException("Cannot add room to a hotel that is not approved");
+//        }
+//
+//        Room room = new Room();
+//        room.setRoomType(roomType);
+//        room.setRoomPrice(roomPrice);
+//        room.setPhoto(new SerialBlob(photo.getBytes()));
+//
+//        Hotel updatedHotel = hotelService.addRoomToHotel(hotelId, room);
+//        RoomResponse roomResponse = new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice());
+//        return ResponseEntity.ok(roomResponse);
+//    }
     // Lấy danh sách Room theo Hotel ID
     @GetMapping("/hotel/{hotelId}")
     public ResponseEntity<List<RoomResponse>> getRoomsByHotel(@PathVariable Long hotelId) throws SQLException {

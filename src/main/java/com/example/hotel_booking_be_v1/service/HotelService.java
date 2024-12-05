@@ -2,17 +2,20 @@ package com.example.hotel_booking_be_v1.service;
 
 import com.example.hotel_booking_be_v1.exception.ResourceNotFoundException;
 import com.example.hotel_booking_be_v1.model.*;
-import com.example.hotel_booking_be_v1.repository.HotelRepository;
-import com.example.hotel_booking_be_v1.repository.RoomRepository;
-import com.example.hotel_booking_be_v1.repository.UserRepository;
-import com.example.hotel_booking_be_v1.repository.WardRepository;
+import com.example.hotel_booking_be_v1.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.sql.rowset.serial.SerialBlob;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,26 +26,85 @@ public class HotelService implements IHotelService {
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final WardRepository wardRepository;
+    private final HotelPhotoRepository hotelPhotoRepository;
 
     @Override
-    public Hotel addHotel(HotelDTO hotelDTO, String ownerEmail) {
+    public Hotel addHotel(HotelDTO hotelDTO, String ownerEmail) throws IOException, SQLException {
+        // Tìm User (owner)
         User owner = userRepository.findByEmail(ownerEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
 
-        // Tìm kiếm Ward từ database theo wardId
+        // Tìm Ward
         Ward ward = wardRepository.findById(hotelDTO.getWardId())
                 .orElseThrow(() -> new ResourceNotFoundException("Ward not found"));
 
-        // Chuyển DTO sang Entity
+        // Tạo đối tượng Hotel
         Hotel hotel = new Hotel();
         hotel.setName(hotelDTO.getName());
         hotel.setPhoneNumber(hotelDTO.getPhoneNumber());
         hotel.setEmail(hotelDTO.getEmail());
         hotel.setDescription(hotelDTO.getDescription());
         hotel.setStreet(hotelDTO.getStreet());
-        hotel.setWard(ward); // Gán Ward vào Hotel
+        hotel.setWard(ward);
         hotel.setOwner(owner);
         hotel.setStatus("PENDING");
+
+        // Lưu ảnh đại diện (cover photo)
+        hotel.setCoverPhoto(new SerialBlob(hotelDTO.getCoverPhoto().getBytes()));
+
+        // Lưu Hotel trước để có ID
+        Hotel savedHotel = hotelRepository.save(hotel);
+
+        // Lưu danh sách ảnh khác (nếu có)
+        if (hotelDTO.getPhotos() != null && !hotelDTO.getPhotos().isEmpty()) {
+            for (MultipartFile photo : hotelDTO.getPhotos()) {
+                HotelPhoto hotelPhoto = new HotelPhoto();
+                hotelPhoto.setPhoto(new SerialBlob(photo.getBytes()));
+                hotelPhoto.setHotel(savedHotel);
+                hotelPhotoRepository.save(hotelPhoto);
+            }
+        }
+
+        return savedHotel;
+    }
+
+    @Override
+    @Transactional
+    public Hotel updateHotel(Long hotelId, HotelDTO hotelDTO) throws Exception {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new Exception("Hotel not found"));
+
+        hotel.setName(hotelDTO.getName());
+        hotel.setPhoneNumber(hotelDTO.getPhoneNumber());
+        hotel.setEmail(hotelDTO.getEmail());
+        hotel.setDescription(hotelDTO.getDescription());
+        hotel.setStreet(hotelDTO.getStreet());
+
+        // Liên kết Ward
+        Ward ward = wardRepository.findById(hotelDTO.getWardId())
+                .orElseThrow(() -> new Exception("Ward not found"));
+        hotel.setWard(ward);
+
+        // Cập nhật ảnh đại diện
+        if (hotelDTO.getCoverPhoto() != null) {
+            hotel.setCoverPhoto(new javax.sql.rowset.serial.SerialBlob(hotelDTO.getCoverPhoto().getBytes()));
+        }
+
+        // Cập nhật danh sách ảnh khác
+        if (hotelDTO.getPhotos() != null && !hotelDTO.getPhotos().isEmpty()) {
+            // Xóa ảnh cũ
+            hotelPhotoRepository.deleteAll(hotel.getPhotos());
+
+            // Lưu ảnh mới
+            List<HotelPhoto> newPhotos = new ArrayList<>();
+            for (MultipartFile photo : hotelDTO.getPhotos()) {
+                HotelPhoto hotelPhoto = new HotelPhoto();
+                hotelPhoto.setPhoto(new javax.sql.rowset.serial.SerialBlob(photo.getBytes()));
+                hotelPhoto.setHotel(hotel);
+                newPhotos.add(hotelPhoto);
+            }
+            hotel.setPhotos(newPhotos);
+        }
 
         return hotelRepository.save(hotel);
     }
@@ -57,7 +119,7 @@ public class HotelService implements IHotelService {
     }
 
     @Override
-    public Optional<Hotel> getHotelById(Long hotelId) {
+    public Optional<Hotel> getHotelById(Long hotelId) throws Exception {
         return hotelRepository.findById(hotelId);
     }
 

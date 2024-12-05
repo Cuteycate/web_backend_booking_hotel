@@ -4,13 +4,17 @@ import com.example.hotel_booking_be_v1.model.Hotel;
 import com.example.hotel_booking_be_v1.model.HotelDTO;
 import com.example.hotel_booking_be_v1.model.Room;
 
+import javax.swing.text.html.Option;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
     public interface IHotelService {
-        Hotel addHotel(HotelDTO hotelDTO, String ownerEmail);
+        Hotel addHotel(HotelDTO hotelDTO, String ownerEmail) throws IOException, SQLException;
+        Hotel updateHotel(Long hotelId, HotelDTO hotelDTO) throws Exception;
 
-    Optional<Hotel> getHotelById(Long hotelId);
+     Optional<Hotel> getHotelById(Long hotelId) throws Exception;
 
     List<Hotel> getHotelsByOwner(String ownerEmail);
 
