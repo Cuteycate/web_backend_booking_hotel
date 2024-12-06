@@ -49,22 +49,42 @@ public class HotelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(registeredHotel);
     }
     //update hotel
+//    @PutMapping("/hotels/update/{id}")
+//    public ResponseEntity<?> updateHotel(
+//            @PathVariable Long id,
+//            @RequestPart("hotel") @Valid HotelDTO hotelDto,
+//            @RequestPart(value = "coverPhoto", required = false) MultipartFile coverPhoto,
+//            @RequestPart(value = "newPhotos", required = false) MultipartFile[] newPhotos) {
+//        try {
+//            // Cập nhật thông tin ảnh đại diện (cover photo)
+//            if (coverPhoto != null) {
+//                hotelDto.setCoverPhoto(coverPhoto);  // Lưu ảnh đại diện mới nếu có
+//            }
+//            if (newPhotos != null) {
+//                hotelDto.setPhotos(Arrays.asList(newPhotos));  // Lưu ảnh phụ mới nếu có
+//            }
+//
+//            // Gửi đến service để xử lý cập nhật
+//            Hotel updatedHotel = hotelService.updateHotel(id, hotelDto);
+//
+//            return ResponseEntity.ok(updatedHotel);
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().body("Error updating hotel: " + e.getMessage());
+//        }
+//    }
     @PutMapping("/hotels/update/{id}")
     public ResponseEntity<?> updateHotel(
             @PathVariable Long id,
-            @RequestPart("hotel") @Valid HotelDTO hotelDto,
-            @RequestPart(value = "coverPhoto", required = false) MultipartFile coverPhoto,
-            @RequestPart(value = "photos", required = false) MultipartFile[] photos) {
+            @ModelAttribute HotelDTO hotelDTO) {
         try {
-            hotelDto.setCoverPhoto(coverPhoto); // Thêm ảnh bìa vào DTO
-            hotelDto.setPhotos(photos != null ? Arrays.asList(photos) : null); // Thêm ảnh phụ vào DTO
-            Hotel updatedHotel = hotelService.updateHotel(id, hotelDto);
+            // Tìm khách sạn theo ID
+            Hotel updatedHotel = hotelService.updateHotel(id, hotelDTO);
+
             return ResponseEntity.ok(updatedHotel);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error updating hotel: " + e.getMessage());
         }
     }
-
 
 
 

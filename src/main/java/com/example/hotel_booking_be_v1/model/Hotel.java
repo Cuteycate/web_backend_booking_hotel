@@ -43,6 +43,7 @@ public class Hotel {
     private String street; // Địa chỉ chi tiết: số nhà, tên đường
 
     @Lob
+    @JsonIgnore  // Không serialize khi trả về JSON
     private Blob coverPhoto; // Hình ảnh đại diện
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)

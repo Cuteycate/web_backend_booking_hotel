@@ -1,5 +1,6 @@
 package com.example.hotel_booking_be_v1.service;
 
+import com.example.hotel_booking_be_v1.Utils.ImageUtils;
 import com.example.hotel_booking_be_v1.exception.ResourceNotFoundException;
 import com.example.hotel_booking_be_v1.model.*;
 import com.example.hotel_booking_be_v1.repository.*;
@@ -13,11 +14,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.sql.rowset.serial.SerialBlob;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -67,47 +69,103 @@ public class HotelService implements IHotelService {
 
         return savedHotel;
     }
-
     @Override
     @Transactional
     public Hotel updateHotel(Long hotelId, HotelDTO hotelDTO) throws Exception {
+        // Tìm khách sạn theo ID
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new Exception("Hotel not found"));
 
-        hotel.setName(hotelDTO.getName());
-        hotel.setPhoneNumber(hotelDTO.getPhoneNumber());
-        hotel.setEmail(hotelDTO.getEmail());
-        hotel.setDescription(hotelDTO.getDescription());
-        hotel.setStreet(hotelDTO.getStreet());
+        // Cập nhật thông tin cơ bản từ DTO
+        if (hotelDTO.getName() != null) {
+            hotel.setName(hotelDTO.getName());
+        }
+        if (hotelDTO.getPhoneNumber() != null) {
+            hotel.setPhoneNumber(hotelDTO.getPhoneNumber());
+        }
+        if (hotelDTO.getEmail() != null) {
+            hotel.setEmail(hotelDTO.getEmail());
+        }
+        if (hotelDTO.getDescription() != null) {
+            hotel.setDescription(hotelDTO.getDescription());
+        }
+        if (hotelDTO.getStreet() != null) {
+            hotel.setStreet(hotelDTO.getStreet());
+        }
 
-        // Liên kết Ward
-        Ward ward = wardRepository.findById(hotelDTO.getWardId())
-                .orElseThrow(() -> new Exception("Ward not found"));
-        hotel.setWard(ward);
+        // Cập nhật Ward (nếu có)
+        if (hotelDTO.getWardId() != null) {
+            Ward ward = wardRepository.findById(hotelDTO.getWardId())
+                    .orElseThrow(() -> new Exception("Ward not found"));
+            hotel.setWard(ward);
+        }
 
-        // Cập nhật ảnh đại diện
+        // Cập nhật ảnh đại diện (cover photo) mới
         if (hotelDTO.getCoverPhoto() != null) {
-            hotel.setCoverPhoto(new javax.sql.rowset.serial.SerialBlob(hotelDTO.getCoverPhoto().getBytes()));
+            // Chuyển MultipartFile thành chuỗi Base64
+            String coverPhotoBase64 = encodeMultipartFileToBase64(hotelDTO.getCoverPhoto());
+
+            // Giải mã Base64 thành Blob
+            Blob coverPhotoBlob = ImageUtils.decodePhoto(coverPhotoBase64);
+            hotel.setCoverPhoto(coverPhotoBlob);
         }
 
-        // Cập nhật danh sách ảnh khác
+        // Cập nhật hoặc xóa các ảnh cũ không còn cần thiết
         if (hotelDTO.getPhotos() != null && !hotelDTO.getPhotos().isEmpty()) {
-            // Xóa ảnh cũ
-            hotelPhotoRepository.deleteAll(hotel.getPhotos());
-
-            // Lưu ảnh mới
-            List<HotelPhoto> newPhotos = new ArrayList<>();
-            for (MultipartFile photo : hotelDTO.getPhotos()) {
-                HotelPhoto hotelPhoto = new HotelPhoto();
-                hotelPhoto.setPhoto(new javax.sql.rowset.serial.SerialBlob(photo.getBytes()));
-                hotelPhoto.setHotel(hotel);
-                newPhotos.add(hotelPhoto);
+            // Loại bỏ các ảnh cũ không còn trong danh sách mới
+            List<HotelPhoto> photosToRemove = new ArrayList<>();
+            for (HotelPhoto existingPhoto : hotel.getPhotos()) {
+                boolean isPhotoPresent = hotelDTO.getPhotos().stream().anyMatch(photo -> {
+                    try {
+                        byte[] existingPhotoBytes = getBytesFromBlob(existingPhoto.getPhoto()); // Đọc blob thành byte[]
+                        return Arrays.equals(photo.getBytes(), existingPhotoBytes);
+                    } catch (SQLException | IOException e) {
+                        return false;
+                    }
+                });
+                if (!isPhotoPresent) {
+                    photosToRemove.add(existingPhoto);
+                }
             }
-            hotel.setPhotos(newPhotos);
+            hotel.getPhotos().removeAll(photosToRemove);
+
+            // Thêm các ảnh mới
+            List<HotelPhoto> newHotelPhotos = new ArrayList<>();
+            for (MultipartFile photo : hotelDTO.getPhotos()) {
+                // Chuyển MultipartFile thành chuỗi Base64 nếu cần thiết
+                String photoBase64 = encodeMultipartFileToBase64(photo); // Mã hóa ảnh
+                Blob photoBlob = ImageUtils.decodePhoto(photoBase64); // Giải mã Base64 thành Blob
+
+                HotelPhoto hotelPhoto = new HotelPhoto();
+                hotelPhoto.setPhoto(photoBlob);
+                hotelPhoto.setHotel(hotel);
+                newHotelPhotos.add(hotelPhoto);
+            }
+            hotel.getPhotos().addAll(newHotelPhotos);
         }
 
+        // Lưu khách sạn đã cập nhật
         return hotelRepository.save(hotel);
     }
+
+    // Helper method to encode MultipartFile to Base64
+    private String encodeMultipartFileToBase64(MultipartFile file) throws IOException {
+        byte[] fileBytes = file.getBytes();
+        return Base64.getEncoder().encodeToString(fileBytes);
+    }
+
+
+    private byte[] getBytesFromBlob(Blob blob) throws SQLException, IOException {
+        InputStream inputStream = blob.getBinaryStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, length);
+        }
+        return outputStream.toByteArray();
+    }
+
 
     @Override
     public List<Hotel> getHotelsByStatus(String status) {

@@ -11,7 +11,7 @@ public class HotelDTO {
     private String phoneNumber;  // Số điện thoại
     private String email;        // Email khách sạn
     private String description;  // Mô tả khách san
-    private String street;       // Địa chỉ chi tiết
+    private String street;   // Địa chỉ chi tiết
     private Long wardId;        // Mã code của Ward
 
     private MultipartFile coverPhoto; // Ảnh đại diện (bắt buộc)

@@ -3,6 +3,7 @@ package com.example.hotel_booking_be_v1.service;
 import com.example.hotel_booking_be_v1.model.Hotel;
 import com.example.hotel_booking_be_v1.model.HotelDTO;
 import com.example.hotel_booking_be_v1.model.Room;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.text.html.Option;
 import java.io.IOException;
