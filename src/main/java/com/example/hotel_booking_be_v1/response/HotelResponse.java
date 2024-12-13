@@ -21,6 +21,7 @@ public class HotelResponse {
     private String wardName; // Tên phường
     private String districtName; // Tên quận
     private String provinceName; // Tên tỉnh
+    private List<String> facilityNames;  // Thêm tiện ích vào đây
 
     public HotelResponse(Long id, String name, String description, String photo, String status, String email, String phoneNumber, String street, String wardName, String districtName, String provinceName) {
         this.id = id;
@@ -35,7 +36,7 @@ public class HotelResponse {
         this.districtName = districtName;
         this.provinceName = provinceName;
     }
-    public HotelResponse(Long id, String name, String description, String photo, List<String> photos, String status, String email, String phoneNumber, String street, String wardName, String districtName, String provinceName) {
+    public HotelResponse(Long id, String name, String description, String photo, List<String> photos, String status, String email, String phoneNumber, String street, String wardName, String districtName, String provinceName,  List<String> facilityNames) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -48,6 +49,7 @@ public class HotelResponse {
         this.wardName = wardName;
         this.districtName = districtName;
         this.provinceName = provinceName;
+        this.facilityNames = facilityNames;
     }
 
 

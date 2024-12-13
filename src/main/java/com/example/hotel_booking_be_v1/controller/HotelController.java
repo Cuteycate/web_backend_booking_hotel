@@ -10,6 +10,7 @@ import com.example.hotel_booking_be_v1.service.DistrictService;
 import com.example.hotel_booking_be_v1.service.HotelService;
 import com.example.hotel_booking_be_v1.service.ProvinceService;
 import com.example.hotel_booking_be_v1.service.WardService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -20,6 +21,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.example.hotel_booking_be_v1.model.HotelFacility;
 
 import java.io.IOException;
 import java.sql.Blob;
@@ -48,30 +50,6 @@ public class HotelController {
         Hotel registeredHotel = hotelService.addHotel(hotelDTO, ownerEmail);
         return ResponseEntity.status(HttpStatus.CREATED).body(registeredHotel);
     }
-    //update hotel
-//    @PutMapping("/hotels/update/{id}")
-//    public ResponseEntity<?> updateHotel(
-//            @PathVariable Long id,
-//            @RequestPart("hotel") @Valid HotelDTO hotelDto,
-//            @RequestPart(value = "coverPhoto", required = false) MultipartFile coverPhoto,
-//            @RequestPart(value = "newPhotos", required = false) MultipartFile[] newPhotos) {
-//        try {
-//            // Cập nhật thông tin ảnh đại diện (cover photo)
-//            if (coverPhoto != null) {
-//                hotelDto.setCoverPhoto(coverPhoto);  // Lưu ảnh đại diện mới nếu có
-//            }
-//            if (newPhotos != null) {
-//                hotelDto.setPhotos(Arrays.asList(newPhotos));  // Lưu ảnh phụ mới nếu có
-//            }
-//
-//            // Gửi đến service để xử lý cập nhật
-//            Hotel updatedHotel = hotelService.updateHotel(id, hotelDto);
-//
-//            return ResponseEntity.ok(updatedHotel);
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body("Error updating hotel: " + e.getMessage());
-//        }
-//    }
     @PutMapping("/hotels/update/{id}")
     public ResponseEntity<?> updateHotel(
             @PathVariable Long id,
@@ -206,6 +184,7 @@ public class HotelController {
             Hotel hotel = hotelOptional.get();
             List<String> encodedPhotos = new ArrayList<>();
 
+            // Encode photos to Base64
             if (hotel.getPhotos() != null && !hotel.getPhotos().isEmpty()) {
                 encodedPhotos = hotel.getPhotos().stream()
                         .filter(photo -> photo.getPhoto() != null) // Bỏ qua ảnh null
@@ -213,6 +192,12 @@ public class HotelController {
                         .collect(Collectors.toList());
             }
 
+            // Lấy tên các tiện ích của khách sạn
+            List<String> facilityNames = hotel.getFacilities().stream()
+                    .map(HotelFacility::getName)  // Lấy tên tiện ích
+                    .collect(Collectors.toList());
+
+            // Tạo đối tượng phản hồi với tất cả thông tin cần thiết
             HotelResponse hotelResponse = new HotelResponse(
                     hotel.getId(),
                     hotel.getName(),
@@ -225,7 +210,8 @@ public class HotelController {
                     hotel.getStreet(),
                     hotel.getWard() != null ? hotel.getWard().getName() : "N/A",
                     hotel.getWard() != null && hotel.getWard().getDistrict() != null ? hotel.getWard().getDistrict().getName() : "N/A",
-                    hotel.getWard() != null && hotel.getWard().getDistrict() != null && hotel.getWard().getDistrict().getProvince() != null ? hotel.getWard().getDistrict().getProvince().getName() : "N/A"
+                    hotel.getWard() != null && hotel.getWard().getDistrict() != null && hotel.getWard().getDistrict().getProvince() != null ? hotel.getWard().getDistrict().getProvince().getName() : "N/A",
+                    facilityNames // Thêm tên các tiện ích vào phản hồi
             );
 
             return ResponseEntity.ok(hotelResponse);
@@ -233,6 +219,7 @@ public class HotelController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving hotel: " + e.getMessage());
         }
     }
+
 
     // Phương thức mã hóa ảnh (không thay đổi)
     private String encodePhoto(Blob photoBlob) {
@@ -245,6 +232,19 @@ public class HotelController {
             }
         }
         return null;
+    }
+
+    @GetMapping("/address/{hotelId}")
+    public ResponseEntity<String> getHotelAddress(@PathVariable Long hotelId) {
+        try {
+            String address = hotelService.getAddressByHotelId(hotelId);
+            return ResponseEntity.ok(address);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while fetching the address.");
+        }
     }
 
 }

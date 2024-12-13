@@ -34,7 +34,8 @@ public class Hotel {
     private User owner;
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Room> rooms = new ArrayList<>();
+    @JsonIgnore
+    private List<Room> rooms;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ward_id")
@@ -47,7 +48,17 @@ public class Hotel {
     private Blob coverPhoto; // Hình ảnh đại diện
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JsonIgnore
     private List<HotelPhoto> photos = new ArrayList<>(); // Danh sách ảnh khác
+
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(
+            name = "hotel_facility_mapping", // Tên bảng trung gian
+            joinColumns = @JoinColumn(name = "hotel_id"), // Khóa ngoại trỏ đến bảng Hotel
+            inverseJoinColumns = @JoinColumn(name = "facility_id") // Khóa ngoại trỏ đến bảng HotelFacility
+    )
+    @JsonIgnore
+    private List<HotelFacility> facilities = new ArrayList<>();
 
 
 

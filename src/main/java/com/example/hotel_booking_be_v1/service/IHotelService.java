@@ -14,7 +14,7 @@ import java.util.Optional;
     public interface IHotelService {
         Hotel addHotel(HotelDTO hotelDTO, String ownerEmail) throws IOException, SQLException;
         Hotel updateHotel(Long hotelId, HotelDTO hotelDTO) throws Exception;
-
+        Hotel getHotelById1(Long hotelId);
      Optional<Hotel> getHotelById(Long hotelId) throws Exception;
 
     List<Hotel> getHotelsByOwner(String ownerEmail);
@@ -39,4 +39,5 @@ import java.util.Optional;
     // Tìm khách sạn theo tỉnh/thành
     public List<Hotel> findHotelsByProvince(Long provinceId);
 
-}
+String getAddressByHotelId(Long hotelId);
+    }

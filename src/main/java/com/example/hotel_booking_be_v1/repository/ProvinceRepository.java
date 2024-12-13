@@ -10,4 +10,5 @@ import java.util.List;
 public interface ProvinceRepository extends JpaRepository<Province, Long> {
     // Tìm tỉnh/thành phố theo tên
     List<Province> findByNameContaining(String name);
+    List<Province> findByNameContainingIgnoreCase(String name);
 }

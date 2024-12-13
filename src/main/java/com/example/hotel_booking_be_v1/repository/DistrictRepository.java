@@ -13,4 +13,6 @@ public interface DistrictRepository extends JpaRepository<District, Long> {
 
     // Tìm tất cả quận/huyện thuộc một tỉnh/thành
     List<District> findByProvinceId(Long provinceId);
+
+    List<District> findByNameContainingIgnoreCase(String name);
 }

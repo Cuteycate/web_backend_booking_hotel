@@ -4,6 +4,7 @@ import com.example.hotel_booking_be_v1.Utils.ImageUtils;
 import com.example.hotel_booking_be_v1.exception.ResourceNotFoundException;
 import com.example.hotel_booking_be_v1.model.*;
 import com.example.hotel_booking_be_v1.repository.*;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +21,7 @@ import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,8 @@ public class HotelService implements IHotelService {
     private final RoomRepository roomRepository;
     private final WardRepository wardRepository;
     private final HotelPhotoRepository hotelPhotoRepository;
+    private final HotelFacilityService hotelFacilityService;
+    private final HotelFacilityRepository hotelFacilityRepository;
 
     @Override
     public Hotel addHotel(HotelDTO hotelDTO, String ownerEmail) throws IOException, SQLException {
@@ -54,6 +58,17 @@ public class HotelService implements IHotelService {
         // Lưu ảnh đại diện (cover photo)
         hotel.setCoverPhoto(new SerialBlob(hotelDTO.getCoverPhoto().getBytes()));
 
+        List<HotelFacility> facilities = new ArrayList<>();
+        if (hotelDTO.getFacilityIds() != null && !hotelDTO.getFacilityIds().isEmpty()) {
+            for (Long facilityId : hotelDTO.getFacilityIds()) {
+                HotelFacility facility = hotelFacilityService.findById(facilityId);
+                if (facility != null) {
+                    facilities.add(facility);
+                }
+            }
+        }
+        hotel.setFacilities(facilities);
+
         // Lưu Hotel trước để có ID
         Hotel savedHotel = hotelRepository.save(hotel);
 
@@ -66,7 +81,6 @@ public class HotelService implements IHotelService {
                 hotelPhotoRepository.save(hotelPhoto);
             }
         }
-
         return savedHotel;
     }
     @Override
@@ -93,6 +107,21 @@ public class HotelService implements IHotelService {
             hotel.setStreet(hotelDTO.getStreet());
         }
 
+        if (hotelDTO.getFacilityNames() != null) {
+            // Xóa các facility cũ
+            hotelFacilityRepository.deleteByHotelId(hotel.getId());
+
+            // Thêm các facility mới
+            List<HotelFacility> newFacilities = hotelDTO.getFacilityNames().stream()
+                    .map(name -> {
+                        HotelFacility facility = hotelFacilityRepository.findByName(name)
+                                .orElseThrow(() -> new RuntimeException("Facility not found with name: " + name));
+                        return facility;
+                    }).collect(Collectors.toList());
+
+            hotel.setFacilities(newFacilities);
+        }
+
         // Cập nhật Ward (nếu có)
         if (hotelDTO.getWardId() != null) {
             Ward ward = wardRepository.findById(hotelDTO.getWardId())
@@ -102,39 +131,17 @@ public class HotelService implements IHotelService {
 
         // Cập nhật ảnh đại diện (cover photo) mới
         if (hotelDTO.getCoverPhoto() != null) {
-            // Chuyển MultipartFile thành chuỗi Base64
-            String coverPhotoBase64 = encodeMultipartFileToBase64(hotelDTO.getCoverPhoto());
-
-            // Giải mã Base64 thành Blob
-            Blob coverPhotoBlob = ImageUtils.decodePhoto(coverPhotoBase64);
+            Blob coverPhotoBlob = convertMultipartFileToBlob(hotelDTO.getCoverPhoto());
             hotel.setCoverPhoto(coverPhotoBlob);
         }
 
         // Cập nhật hoặc xóa các ảnh cũ không còn cần thiết
         if (hotelDTO.getPhotos() != null && !hotelDTO.getPhotos().isEmpty()) {
-            // Loại bỏ các ảnh cũ không còn trong danh sách mới
-            List<HotelPhoto> photosToRemove = new ArrayList<>();
-            for (HotelPhoto existingPhoto : hotel.getPhotos()) {
-                boolean isPhotoPresent = hotelDTO.getPhotos().stream().anyMatch(photo -> {
-                    try {
-                        byte[] existingPhotoBytes = getBytesFromBlob(existingPhoto.getPhoto()); // Đọc blob thành byte[]
-                        return Arrays.equals(photo.getBytes(), existingPhotoBytes);
-                    } catch (SQLException | IOException e) {
-                        return false;
-                    }
-                });
-                if (!isPhotoPresent) {
-                    photosToRemove.add(existingPhoto);
-                }
-            }
-            hotel.getPhotos().removeAll(photosToRemove);
+            hotel.getPhotos().clear();
 
-            // Thêm các ảnh mới
             List<HotelPhoto> newHotelPhotos = new ArrayList<>();
             for (MultipartFile photo : hotelDTO.getPhotos()) {
-                // Chuyển MultipartFile thành chuỗi Base64 nếu cần thiết
-                String photoBase64 = encodeMultipartFileToBase64(photo); // Mã hóa ảnh
-                Blob photoBlob = ImageUtils.decodePhoto(photoBase64); // Giải mã Base64 thành Blob
+                Blob photoBlob = convertMultipartFileToBlob(photo);
 
                 HotelPhoto hotelPhoto = new HotelPhoto();
                 hotelPhoto.setPhoto(photoBlob);
@@ -144,14 +151,22 @@ public class HotelService implements IHotelService {
             hotel.getPhotos().addAll(newHotelPhotos);
         }
 
-        // Lưu khách sạn đã cập nhật
-        return hotelRepository.save(hotel);
+        try {
+            hotelRepository.save(hotel);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error updating hotel: " + e.getMessage());
+        }
+        return hotel;
     }
 
-    // Helper method to encode MultipartFile to Base64
-    private String encodeMultipartFileToBase64(MultipartFile file) throws IOException {
-        byte[] fileBytes = file.getBytes();
-        return Base64.getEncoder().encodeToString(fileBytes);
+    // Helper method to convert MultipartFile to Blob
+    private Blob convertMultipartFileToBlob(MultipartFile file) throws IOException {
+        try (InputStream inputStream = file.getInputStream()) {
+            return new javax.sql.rowset.serial.SerialBlob(inputStream.readAllBytes());
+        } catch (SQLException e) {
+            throw new IOException("Failed to convert file to Blob", e);
+        }
     }
 
 
@@ -179,6 +194,10 @@ public class HotelService implements IHotelService {
     @Override
     public Optional<Hotel> getHotelById(Long hotelId) throws Exception {
         return hotelRepository.findById(hotelId);
+    }
+
+    public Hotel getHotelById1(Long hotelId) {
+        return hotelRepository.findById(hotelId).orElse(null);
     }
 
     @Override
@@ -271,5 +290,26 @@ public class HotelService implements IHotelService {
     // Tìm khách sạn theo tỉnh/thành
     public List<Hotel> findHotelsByProvince(Long provinceId) {
         return hotelRepository.findByProvinceId(provinceId);
+    }
+
+    @Override
+    public String getAddressByHotelId(Long hotelId) {
+        Hotel hotel = hotelRepository.findHotelWithAddress(hotelId);
+        if (hotel == null) {
+            throw new EntityNotFoundException("Hotel not found with ID: " + hotelId);
+        }
+
+        // Lấy thông tin địa chỉ
+        Ward ward = hotel.getWard();
+        District district = ward.getDistrict();
+        Province province = district.getProvince();
+
+        return String.format(
+                "%s, %s, %s, %s",
+                hotel.getStreet(),
+                ward.getName(),
+                district.getName(),
+                province.getName()
+        );
     }
 }

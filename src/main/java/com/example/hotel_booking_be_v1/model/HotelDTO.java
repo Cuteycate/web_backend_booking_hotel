@@ -17,4 +17,8 @@ public class HotelDTO {
     private MultipartFile coverPhoto; // Ảnh đại diện (bắt buộc)
     private List<MultipartFile> photos; // Danh sách ảnh khác (tùy chọn)
 
+    private Float starRating;    // Số sao
+    private List<Long> facilityIds;
+    private List<String> facilityNames;
+
 }
