@@ -1,21 +1,15 @@
 package com.example.hotel_booking_be_v1.controller;
 
 
-import com.example.hotel_booking_be_v1.exception.InvalidBookingRequestException;
-import com.example.hotel_booking_be_v1.exception.ResourceNotFoundException;
 import com.example.hotel_booking_be_v1.model.*;
-import com.example.hotel_booking_be_v1.response.BookingResponse;
-import com.example.hotel_booking_be_v1.response.RoomResponse;
 import com.example.hotel_booking_be_v1.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
