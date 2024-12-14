@@ -2,6 +2,7 @@ package com.example.hotel_booking_be_v1.service;
 
 import com.example.hotel_booking_be_v1.model.Booking;
 import com.example.hotel_booking_be_v1.model.BookingStatus;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,4 +25,6 @@ public interface IBookingService {
     List<Booking> findBookingsByStatus(BookingStatus status);
 
     List<Booking> findBookingsBetweenDates(LocalDate startDate, LocalDate endDate);
+
+    int countBookedRooms(Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
 }

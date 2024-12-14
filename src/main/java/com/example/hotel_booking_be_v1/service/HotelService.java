@@ -228,14 +228,6 @@ public class HotelService implements IHotelService {
         return hotelRepository.save(hotel);
     }
 
-//    @Override
-//    public Hotel approveHotel(Long hotelId) {
-//        Hotel hotel = hotelRepository.findById(hotelId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found"));
-//
-//        hotel.setStatus("APPROVED");
-//        return hotelRepository.save(hotel);
-//    }
 
     @Override
     public Hotel rejectHotel(Long hotelId) {
@@ -311,5 +303,24 @@ public class HotelService implements IHotelService {
                 district.getName(),
                 province.getName()
         );
+    }
+
+    @Override
+    public List<Hotel> findHotelsByLocation(Long locationCode, String locationType) {
+        List<Hotel> hotels;
+        switch (locationType.toLowerCase()) {
+            case "ward":
+                hotels = hotelRepository.findByWardCode(locationCode);
+                break;
+            case "district":
+                hotels = hotelRepository.findByDistrictCode(locationCode);
+                break;
+            case "province":
+                hotels = hotelRepository.findByProvinceCode(locationCode);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid location type. Must be 'ward', 'district', or 'province'.");
+        }
+        return hotels;
     }
 }

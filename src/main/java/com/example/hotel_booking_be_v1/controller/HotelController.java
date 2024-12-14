@@ -133,8 +133,6 @@ public class HotelController {
         return ResponseEntity.ok(rejectedHotel);
     }
 
-
-
     // Lấy tất cả các Hotel
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")

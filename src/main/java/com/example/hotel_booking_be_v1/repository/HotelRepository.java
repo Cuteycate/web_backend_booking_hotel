@@ -26,4 +26,15 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
 
     @Query("SELECT h FROM Hotel h JOIN FETCH h.ward w JOIN FETCH w.district d JOIN FETCH d.province p WHERE h.id = :hotelId")
     Hotel findHotelWithAddress(@Param("hotelId") Long hotelId);
+
+    @Query("SELECT h FROM Hotel h WHERE h.ward.code = :wardCode")
+    List<Hotel> findByWardCode(@Param("wardCode") Long wardCode);
+
+    // Tìm khách sạn theo mã quận/huyện
+    @Query("SELECT h FROM Hotel h WHERE h.ward.district.code = :districtCode")
+    List<Hotel> findByDistrictCode(@Param("districtCode") Long districtCode);
+
+    // Tìm khách sạn theo mã tỉnh/thành
+    @Query("SELECT h FROM Hotel h WHERE h.ward.district.province.code = :provinceCode")
+    List<Hotel> findByProvinceCode(@Param("provinceCode") Long provinceCode);
 }

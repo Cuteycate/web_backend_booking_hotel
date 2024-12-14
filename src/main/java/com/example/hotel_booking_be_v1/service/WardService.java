@@ -16,15 +16,15 @@ public class WardService implements IWardService {
         this.wardRepository = wardRepository;
     }
 
-    public List<Ward> findAllwards() {
+    public List<Ward> findAllWards() {
         return wardRepository.findAll();
     }
 
-    public List<Ward> findwardsByDistrict(Long districtId) {
+    public List<Ward> findWardsByDistrict(Long districtId) {
         return wardRepository.findByDistrictId(districtId);
     }
 
-    public List<Ward> searchwardsByName(String name) {
+    public List<Ward> searchWardsByName(String name) {
         return wardRepository.findByNameContaining(name);
     }
 }

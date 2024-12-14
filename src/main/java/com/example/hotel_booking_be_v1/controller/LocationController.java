@@ -55,12 +55,12 @@ public class LocationController {
     // API lấy tất cả xã/phường của quận
     @GetMapping("/wards")
     public List<Ward> getWardsByDistrict(@RequestParam Long districtId) {
-        return wardService.findwardsByDistrict(districtId);
+        return wardService.findWardsByDistrict(districtId);
     }
 
     // API tìm xã/phường theo tên
     @GetMapping("/wards/search")
     public List<Ward> searchWards(@RequestParam String name) {
-        return wardService.searchwardsByName(name);
+        return wardService.searchWardsByName(name);
     }
 }

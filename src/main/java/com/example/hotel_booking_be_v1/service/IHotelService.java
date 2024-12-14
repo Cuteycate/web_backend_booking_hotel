@@ -39,5 +39,7 @@ import java.util.Optional;
     // Tìm khách sạn theo tỉnh/thành
     public List<Hotel> findHotelsByProvince(Long provinceId);
 
-String getAddressByHotelId(Long hotelId);
+    String getAddressByHotelId(Long hotelId);
+
+        List<Hotel> findHotelsByLocation(Long locationCode, String locationType);
     }
