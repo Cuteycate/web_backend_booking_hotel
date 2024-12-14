@@ -63,15 +63,70 @@ public class HotelController {
             return ResponseEntity.badRequest().body("Error updating hotel: " + e.getMessage());
         }
     }
-
-
-
     @GetMapping("/pending")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<Hotel>> getPendingHotels() {
-        List<Hotel> pendingHotels = hotelService.getHotelsByStatus("PENDING");
-        return ResponseEntity.ok(pendingHotels);
+    public ResponseEntity<List<HotelResponse>> getPendingHotels() {
+        try {
+            // Lấy danh sách khách sạn có trạng thái "PENDING"
+            List<Hotel> pendingHotels = hotelService.getHotelsByStatus("PENDING");
+            if (pendingHotels.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+            }
+
+            List<HotelResponse> hotelResponses = new ArrayList<>();
+
+            // Xử lý từng khách sạn
+            for (Hotel hotel : pendingHotels) {
+                List<String> encodedPhotos = new ArrayList<>();
+
+                // Mã hóa ảnh phụ thành Base64
+                if (hotel.getPhotos() != null && !hotel.getPhotos().isEmpty()) {
+                    encodedPhotos = hotel.getPhotos().stream()
+                            .filter(photo -> photo.getPhoto() != null)  // Bỏ qua ảnh null
+                            .map(photo -> encodePhoto(photo.getPhoto()))  // Mã hóa ảnh thành Base64
+                            .collect(Collectors.toList());
+                }
+
+                // Lấy tên các tiện ích của khách sạn
+                List<String> facilityNames = hotel.getFacilities().stream()
+                        .map(HotelFacility::getName)  // Lấy tên tiện ích
+                        .collect(Collectors.toList());
+
+                // Tạo đối tượng phản hồi với tất cả thông tin cần thiết
+                HotelResponse hotelResponse = new HotelResponse(
+                        hotel.getId(),
+                        hotel.getName(),
+                        hotel.getDescription(),
+                        encodePhoto(hotel.getCoverPhoto()),  // Ảnh đại diện
+                        encodedPhotos,  // Danh sách ảnh phụ
+                        hotel.getStatus(),
+                        hotel.getEmail(),
+                        hotel.getPhoneNumber(),
+                        hotel.getStreet(),
+                        hotel.getWard() != null ? hotel.getWard().getName() : "N/A",  // Tên phường
+                        hotel.getWard() != null && hotel.getWard().getDistrict() != null ? hotel.getWard().getDistrict().getName() : "N/A",  // Tên quận
+                        hotel.getWard() != null && hotel.getWard().getDistrict() != null && hotel.getWard().getDistrict().getProvince() != null ? hotel.getWard().getDistrict().getProvince().getName() : "N/A",  // Tên tỉnh
+                        facilityNames // Danh sách tiện ích
+                );
+
+                hotelResponses.add(hotelResponse);
+            }
+
+            // Trả về danh sách khách sạn kèm thông tin chi tiết
+            return ResponseEntity.ok(hotelResponses);
+
+        } catch (Exception e) {
+            HotelResponse errorResponse = new HotelResponse();
+            errorResponse.setName("Error retrieving pending hotels");
+            errorResponse.setDescription("An error occurred while retrieving the pending hotels list.");
+            errorResponse.setStatus("ERROR");
+            errorResponse.setEmail(e.getMessage());  // Có thể lưu thông tin lỗi chi tiết tại đây
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonList(errorResponse));
+        }
     }
+
+
 
     // API phê duyệt khách sạn
     @PutMapping("/approve/{hotelId}")

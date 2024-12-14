@@ -28,7 +28,7 @@ public class LocationController {
     }
 
     // API lấy tất cả tỉnh/thành phố
-    @PreAuthorize("hasRole('ROLE_RENTAL')")
+    @PreAuthorize("hasAnyRole('ROLE_RENTAL', 'ROLE_ADMIN')")
     @GetMapping("/provinces")
     public List<Province> getAllProvinces() {
         return provinceService.findAllProvinces();

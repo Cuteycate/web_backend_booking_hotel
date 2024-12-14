@@ -1,6 +1,7 @@
 package com.example.hotel_booking_be_v1.controller;
 
 import com.example.hotel_booking_be_v1.model.HotelFacility;
+import com.example.hotel_booking_be_v1.model.HotelFacilityDTO;
 import com.example.hotel_booking_be_v1.service.HotelFacilityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +17,15 @@ public class HotelFacilityController {
     private HotelFacilityService hotelfacilityService;
 
     @PostMapping
-    public ResponseEntity<HotelFacility> createFacility(@RequestBody HotelFacility facility) {
+    public ResponseEntity<HotelFacility> createFacility(@ModelAttribute HotelFacilityDTO facilityDTO) {
+        HotelFacility facility = new HotelFacility();
+        facility.setName(facilityDTO.getName());
         HotelFacility newFacility = hotelfacilityService.addFacility(facility);
         return ResponseEntity.ok(newFacility);
     }
 
     // Get all facilities
-    @Secured("ROLE_RENTAL")
+
     @GetMapping
     public ResponseEntity<List<HotelFacility>> getAllFacilities() {
         List<HotelFacility> facilities = hotelfacilityService.getAllFacilities();

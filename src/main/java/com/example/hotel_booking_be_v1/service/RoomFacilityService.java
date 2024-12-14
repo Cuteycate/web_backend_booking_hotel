@@ -1,5 +1,6 @@
 package com.example.hotel_booking_be_v1.service;
 
+import com.example.hotel_booking_be_v1.model.HotelFacility;
 import com.example.hotel_booking_be_v1.model.RoomFacility;
 import com.example.hotel_booking_be_v1.repository.RoomFacilityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,5 +28,9 @@ public class RoomFacilityService {
 
     public List<RoomFacility> getAllFacilities() {
         return roomFacilityRepository.findAll();
+    }
+    // Add a new facility
+    public RoomFacility addFacility(RoomFacility facility) {
+        return roomFacilityRepository.save(facility);
     }
 }
