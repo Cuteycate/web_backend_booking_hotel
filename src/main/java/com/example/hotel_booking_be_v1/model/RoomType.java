@@ -15,6 +15,8 @@ public class RoomType {
 
     private String name;
 
+    private Integer adults;
+
     @OneToMany(mappedBy = "roomType", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Room> rooms;
