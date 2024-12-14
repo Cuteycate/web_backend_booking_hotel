@@ -21,23 +21,10 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
-//    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<?> addReview(
-//            @RequestPart("review") ReviewDTO reviewDTO,
-//            @RequestPart("photos") List<MultipartFile> photos) {
-//        try {
-//            reviewDTO.setPhotos(photos);
-//            Review review = reviewService.addReview(reviewDTO);
-//            return ResponseEntity.status(HttpStatus.CREATED)
-//                    .body("Review added successfully with ID: " + review.getId());
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("Error: " + e.getMessage());
-//        }
-//    }
-    @PostMapping(value = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
+
+    @PostMapping("/add")
     public ResponseEntity<?> addReview(
-            @RequestBody ReviewDTO reviewDTO) {
+            @ModelAttribute ReviewDTO reviewDTO) {
         try {
             Review review = reviewService.addReview(reviewDTO);
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -58,4 +45,6 @@ public class ReviewController {
         List<Review> reviews = reviewService.findByUserId(userId);
         return ResponseEntity.ok(reviews);
     }
+
+
 }
