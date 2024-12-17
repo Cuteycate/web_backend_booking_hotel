@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface HotelRepository extends JpaRepository<Hotel, Long> {
@@ -37,4 +38,8 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
     // Tìm khách sạn theo mã tỉnh/thành
     @Query("SELECT h FROM Hotel h WHERE h.ward.district.province.code = :provinceCode")
     List<Hotel> findByProvinceCode(@Param("provinceCode") Long provinceCode);
+
+    List<Hotel> findByNameContaining(String name);
+    @Query("SELECT h.id FROM Hotel h WHERE h.name = :hotelName")
+    Optional<Long> findHotelIdByName(@Param("hotelName") String hotelName);
 }

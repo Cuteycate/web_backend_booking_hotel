@@ -58,6 +58,9 @@ public class UserService implements IUserService{
     public User getUserById (Long id){
         return userRepository.findById(id).orElse(null);
     }
-
-
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElse(null); // Hoặc ném exception nếu bạn muốn
+    }
 }

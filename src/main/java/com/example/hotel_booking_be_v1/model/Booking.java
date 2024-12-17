@@ -1,6 +1,7 @@
 package com.example.hotel_booking_be_v1.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -25,9 +26,6 @@ public class Booking {
     @Column(nullable = false)
     private int numberOfGuests; // Số lượng khách
 
-    @Column(nullable = false)
-    private BigDecimal totalPrice; // Tổng giá
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BookingStatus status; // Trạng thái đặt phòng
@@ -46,11 +44,17 @@ public class Booking {
             joinColumns = @JoinColumn(name = "booking_id"),
             inverseJoinColumns = @JoinColumn(name = "room_id")
     )
+
     @JsonIgnore
     private List<Room> rooms; // Danh sách phòng đặt
 
     @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Review review; // Liên kết tới Review
+
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Invoice invoice; // Liên kết tới Hóa đơn
+
 
 }

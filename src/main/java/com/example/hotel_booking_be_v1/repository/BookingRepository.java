@@ -35,4 +35,14 @@ public interface BookingRepository extends JpaRepository<Booking,Long> {
             @Param("bookingId") Long bookingId,
             @Param("currentDate") LocalDate currentDate
     );
+
+
+    @Query("SELECT b FROM Booking b WHERE b.hotel.id = :hotelId " +
+            "AND ((b.checkInDate < :checkOutDate AND b.checkOutDate > :checkInDate))")
+    List<Booking> findOverlappingBookings(@Param("hotelId") Long hotelId,
+                                          @Param("checkInDate") LocalDate checkInDate,
+                                          @Param("checkOutDate") LocalDate checkOutDate);
+
+    @Query("SELECT b FROM Booking b JOIN b.rooms r WHERE r.id = :roomId AND b.checkInDate < :checkOutDate AND b.checkOutDate > :checkInDate")
+    List<Booking> findBookingsByRoomAndDateRange(@Param("roomId") Long roomId, @Param("checkInDate") LocalDate checkInDate, @Param("checkOutDate") LocalDate checkOutDate);
 }

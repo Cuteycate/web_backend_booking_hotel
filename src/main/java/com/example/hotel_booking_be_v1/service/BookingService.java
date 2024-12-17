@@ -2,7 +2,9 @@ package com.example.hotel_booking_be_v1.service;
 
 import com.example.hotel_booking_be_v1.model.Booking;
 import com.example.hotel_booking_be_v1.model.BookingStatus;
+import com.example.hotel_booking_be_v1.model.Invoice;
 import com.example.hotel_booking_be_v1.repository.BookingRepository;
+import com.example.hotel_booking_be_v1.service.InvoiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.List;
 public class BookingService implements IBookingService  {
     private final BookingRepository bookingRepository;
     private final IRoomService roomService;
+    private final InvoiceService invoiceService; // Tiêm InvoiceService vào
 
     public void saveBooking(Booking booking) {
         bookingRepository.save(booking);
@@ -40,4 +43,15 @@ public class BookingService implements IBookingService  {
         return bookingRepository.countBookedRooms(roomId, checkInDate, checkOutDate);
     }
 
+    @Override
+    public void saveBookingWithInvoice(Booking booking) {
+        Invoice invoice = invoiceService.createInvoiceForBooking(booking);
+        booking.setInvoice(invoice);
+        bookingRepository.save(booking);
+    }
+
+    @Override
+    public List<Booking> findOverlappingBookings(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
+        return bookingRepository.findBookingsByRoomAndDateRange(roomId, checkInDate, checkOutDate);
+    }
 }

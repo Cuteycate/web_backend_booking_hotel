@@ -41,6 +41,7 @@ public class RoomController {
     private final RoomFacilityService roomFacilityService;
     private final RoomRepository roomRepository;
     private final RoomPhotoRepository roomPhotoRepository;
+
     @GetMapping("/{hotelId}")
     public ResponseEntity<List<RoomResponse>> getRoomsByHotelId(@PathVariable Long hotelId) {
         // Lấy danh sách phòng theo hotelId

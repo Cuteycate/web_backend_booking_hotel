@@ -22,6 +22,8 @@ public class HotelResponse {
     private String districtName; // Tên quận
     private String provinceName; // Tên tỉnh
     private List<String> facilityNames;  // Thêm tiện ích vào đây
+    private int ratingCount; // Số lượng đánh giá
+    private float starRating; // Xếp hạng sao
 
     public HotelResponse(Long id, String name, String description, String photo, String status, String email, String phoneNumber, String street, String wardName, String districtName, String provinceName) {
         this.id = id;
@@ -52,6 +54,23 @@ public class HotelResponse {
         this.facilityNames = facilityNames;
     }
 
+    public HotelResponse(Long id, String name, String description, String photo, List<String> photos, String status, String email, String phoneNumber, String street, String wardName, String districtName, String provinceName,  List<String> facilityNames, int ratingCount, float starRating ) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.photo = photo;
+        this.photos = photos;
+        this.status = status;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.street = street;
+        this.wardName = wardName;
+        this.districtName = districtName;
+        this.provinceName = provinceName;
+        this.facilityNames = facilityNames;
+        this.ratingCount = ratingCount;
+        this.starRating = starRating;
+    }
 
 }
 

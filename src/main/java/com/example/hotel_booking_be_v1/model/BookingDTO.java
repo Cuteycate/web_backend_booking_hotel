@@ -20,8 +20,6 @@ public class BookingDTO {
 
     private BookingStatus status;
 
-    private Long userId;
-
     private Long hotelId;
 
     private List<Long> roomIds;

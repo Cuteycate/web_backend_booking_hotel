@@ -1,9 +1,7 @@
 package com.example.hotel_booking_be_v1.controller;
 
 import com.example.hotel_booking_be_v1.exception.PhotoRetrievalException;
-import com.example.hotel_booking_be_v1.model.Hotel;
-import com.example.hotel_booking_be_v1.model.HotelDTO;
-import com.example.hotel_booking_be_v1.model.Room;
+import com.example.hotel_booking_be_v1.model.*;
 import com.example.hotel_booking_be_v1.repository.UserRepository;
 import com.example.hotel_booking_be_v1.response.HotelResponse;
 import com.example.hotel_booking_be_v1.service.DistrictService;
@@ -21,7 +19,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.example.hotel_booking_be_v1.model.HotelFacility;
 
 import java.io.IOException;
 import java.sql.Blob;
@@ -211,19 +208,79 @@ public class HotelController {
         Hotel updatedHotel = hotelService.addRoomToHotel(hotelId, room);
         return ResponseEntity.ok(updatedHotel);
     }
-    @GetMapping("/by-ward/{wardId}")
-    public List<Hotel> getHotelsByWard(@PathVariable Long wardId) {
-        return hotelService.findHotelsByWard(wardId);
-    }
+//    @GetMapping("/by-ward/{wardId}")
+//    public List<Hotel> getHotelsByWard(@PathVariable Long wardId) {
+//        return hotelService.findHotelsByWard(wardId);
+//    }
+//
+//    @GetMapping("/by-district/{districtId}")
+//    public List<Hotel> getHotelsByDistrict(@PathVariable Long districtId) {
+//        return hotelService.findHotelsByDistrict(districtId);
+//    }
+//
+//    @GetMapping("/by-province/{provinceId}")
+//    public List<Hotel> getHotelsByProvince(@PathVariable Long provinceId) {
+//        return hotelService.findHotelsByProvince(provinceId);
+//    }
+@GetMapping("/by-ward/{wardId}")
+public ResponseEntity<List<HotelResponse>> getHotelsByWard(@PathVariable Long wardId) {
+    return ResponseEntity.ok(convertHotelsToResponses(hotelService.findHotelsByWard(wardId)));
+}
 
     @GetMapping("/by-district/{districtId}")
-    public List<Hotel> getHotelsByDistrict(@PathVariable Long districtId) {
-        return hotelService.findHotelsByDistrict(districtId);
+    public ResponseEntity<List<HotelResponse>> getHotelsByDistrict(@PathVariable Long districtId) {
+        return ResponseEntity.ok(convertHotelsToResponses(hotelService.findHotelsByDistrict(districtId)));
     }
 
     @GetMapping("/by-province/{provinceId}")
-    public List<Hotel> getHotelsByProvince(@PathVariable Long provinceId) {
-        return hotelService.findHotelsByProvince(provinceId);
+    public ResponseEntity<List<HotelResponse>> getHotelsByProvince(@PathVariable Long provinceId) {
+        return ResponseEntity.ok(convertHotelsToResponses(hotelService.findHotelsByProvince(provinceId)));
+    }
+
+
+    private List<HotelResponse> convertHotelsToResponses(List<Hotel> hotels) {
+        List<HotelResponse> hotelResponses = new ArrayList<>();
+
+        for (Hotel hotel : hotels) {
+            String coverPhotoBase64 = encodePhoto(hotel.getCoverPhoto());
+
+            // Chuyển đổi danh sách ảnh phụ sang Base64
+            List<String> photoBase64List = new ArrayList<>();
+            for (HotelPhoto photo : hotel.getPhotos()) {
+                String photoBase64 = encodePhoto(photo.getPhoto());
+                if (photoBase64 != null) {
+                    photoBase64List.add(photoBase64);
+                }
+            }
+
+            // Chuyển đổi danh sách facilities thành chuỗi tên
+            List<String> facilities = hotel.getFacilities().stream()
+                    .map(HotelFacility::getName)
+                    .toList();
+
+            HotelResponse hotelResponse = new HotelResponse(
+                    hotel.getId(),
+                    hotel.getName(),
+                    hotel.getDescription(),
+                    coverPhotoBase64, // Ảnh đại diện
+                    photoBase64List,
+                    hotel.getStatus(),
+                    hotel.getEmail(),
+                    hotel.getPhoneNumber(),
+                    hotel.getStreet(),
+                    hotel.getWard() != null ? hotel.getWard().getName() : "N/A",
+                    hotel.getWard() != null && hotel.getWard().getDistrict() != null ? hotel.getWard().getDistrict().getName() : "N/A",
+                    hotel.getWard() != null && hotel.getWard().getDistrict().getProvince() != null ? hotel.getWard().getDistrict().getProvince().getName() : "N/A",
+                    facilities,
+                    hotel.getRatingCount(),
+                    hotel.getStarRating()
+
+            );
+
+            hotelResponses.add(hotelResponse);
+        }
+
+        return hotelResponses;
     }
 
     @GetMapping("/hotels/{id}")

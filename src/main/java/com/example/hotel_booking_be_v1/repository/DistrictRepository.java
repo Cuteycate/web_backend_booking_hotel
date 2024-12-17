@@ -15,4 +15,5 @@ public interface DistrictRepository extends JpaRepository<District, Long> {
     List<District> findByProvinceId(Long provinceId);
 
     List<District> findByNameContainingIgnoreCase(String name);
+
 }

@@ -27,4 +27,7 @@ public interface IBookingService {
     List<Booking> findBookingsBetweenDates(LocalDate startDate, LocalDate endDate);
 
     int countBookedRooms(Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
+
+    void saveBookingWithInvoice(Booking booking);
+    List<Booking> findOverlappingBookings(Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
 }
