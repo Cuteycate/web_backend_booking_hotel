@@ -15,16 +15,16 @@ public class RoomAvailabilityController {
     @Autowired
     private RoomAvailabilityService roomAvailabilityService;
 
-    @GetMapping("/{hotelName}/available-rooms")
+    @GetMapping("/{hotelId}/available-rooms")
     public ResponseEntity<Map<String, Object>> getAvailableRooms(
-            @PathVariable String hotelName,
+            @PathVariable Long hotelId,
             @RequestParam String checkInDate,
             @RequestParam String checkOutDate) {
 
         LocalDate checkIn = LocalDate.parse(checkInDate);
         LocalDate checkOut = LocalDate.parse(checkOutDate);
 
-        Map<String, Object> response = roomAvailabilityService.getHotelWithAvailableRooms(hotelName, checkIn, checkOut);
+        Map<String, Object> response = roomAvailabilityService.getHotelWithAvailableRooms(hotelId, checkIn, checkOut);
         return ResponseEntity.ok(response);
     }
 }

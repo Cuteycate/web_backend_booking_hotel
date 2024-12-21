@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class JwtUtils {
@@ -36,7 +37,17 @@ public class JwtUtils {
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
     }
-
+    public String generateJwtTokenForGoogle(Map<String, Object> attributes) {
+        // Triển khai logic tạo JWT token
+        // Ví dụ:
+        String email = (String) attributes.get("email");
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 ngày
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }

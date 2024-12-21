@@ -77,6 +77,7 @@ public class RoomController {
                     room.getQuantity(),
                     room.getRoomType() != null ? room.getRoomType().getName() : "N/A", // Loại phòng
                     base64Photos, // Danh sách ảnh Base64
+                    room.getDepositPercentage(),
                     room.getFacilities().stream().map(RoomFacility::getName).collect(Collectors.toList()) // Tên các tiện nghi
             );
             roomResponses.add(roomResponse);
@@ -108,6 +109,7 @@ public class RoomController {
             room.setQuantity(roomDTO.getQuantity());
             room.setHotel(hotel);
             room.setRoomType(roomType);
+            room.setDepositPercentage(roomDTO.getDepositPercentage());
 
             // Liên kết tiện ích
             List<RoomFacility> facilities = roomFacilityService.findByIds(roomDTO.getFacilityIds());
@@ -154,6 +156,7 @@ public class RoomController {
                                 }
                             })
                             .collect(Collectors.toList()),
+                    room.getDepositPercentage(),
                     room.getFacilities().stream().map(RoomFacility::getName).collect(Collectors.toList()),
                     room.getFacilities().stream().collect(Collectors.toList()),
                     room.getRoomType()
@@ -175,6 +178,7 @@ public class RoomController {
             room.setName(roomDTO.getName());
             room.setRoomPrice(roomDTO.getRoomPrice());
             room.setQuantity(roomDTO.getQuantity());
+            room.setDepositPercentage(roomDTO.getDepositPercentage());
 
             // Cập nhật loại phòng
             RoomType roomType = roomTypeService.findRoomTypeById(roomDTO.getRoomTypeId());

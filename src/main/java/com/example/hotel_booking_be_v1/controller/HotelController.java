@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.*;
@@ -257,6 +258,11 @@ public ResponseEntity<List<HotelResponse>> getHotelsByWard(@PathVariable Long wa
             List<String> facilities = hotel.getFacilities().stream()
                     .map(HotelFacility::getName)
                     .toList();
+            // Tìm giá phòng rẻ nhất
+            BigDecimal cheapestRoomPrice = hotel.getRooms().stream()
+                    .map(Room::getRoomPrice)
+                    .min(BigDecimal::compareTo)
+                    .orElse(BigDecimal.ZERO);
 
             HotelResponse hotelResponse = new HotelResponse(
                     hotel.getId(),
@@ -273,8 +279,8 @@ public ResponseEntity<List<HotelResponse>> getHotelsByWard(@PathVariable Long wa
                     hotel.getWard() != null && hotel.getWard().getDistrict().getProvince() != null ? hotel.getWard().getDistrict().getProvince().getName() : "N/A",
                     facilities,
                     hotel.getRatingCount(),
-                    hotel.getStarRating()
-
+                    hotel.getStarRating(),
+                    cheapestRoomPrice
             );
 
             hotelResponses.add(hotelResponse);

@@ -19,25 +19,28 @@ public class RoomResponse {
     private RoomType roomTypeDetails;
     private List<String> photos; // Danh sách ảnh (Base64)
     private List<String> facilities; // Danh sách tên các tiện nghi của room //này để truyền name thôi
+    private BigDecimal depositPercentage;
     private List<RoomFacility> facilityDetails; // Thay vì List<String>, sử dụng List<FacilityDTO> // này để truyền cả ID theo name để update
 
     // Constructor cơ bản
-    public RoomResponse(Long id, String name, BigDecimal roomPrice, int quantity, String roomType, List<String> photos, List<String> facilities) {
+    public RoomResponse(Long id, String name, BigDecimal roomPrice, int quantity, String roomType, List<String> photos, BigDecimal depositPercentage, List<String> facilities) {
         this.id = id;
         this.name = name;
         this.roomPrice = roomPrice;
         this.quantity = quantity;
         this.roomType = roomType;
         this.photos = photos;
+        this.depositPercentage = depositPercentage;
         this.facilities = facilities;
     }
-    public RoomResponse(Long id, String name, BigDecimal roomPrice, int quantity, String roomType, List<String> photos, List<String> facilities,List<RoomFacility> facilityDetails, RoomType roomTypeDetails) {
+    public RoomResponse(Long id, String name, BigDecimal roomPrice, int quantity, String roomType, List<String> photos, BigDecimal depositPercentage ,List<String> facilities,List<RoomFacility> facilityDetails, RoomType roomTypeDetails) {
         this.id = id;
         this.name = name;
         this.roomPrice = roomPrice;
         this.quantity = quantity;
         this.roomType = roomType;
         this.photos = photos;
+        this.depositPercentage = depositPercentage;
         this.facilityDetails = facilityDetails;
         this.roomTypeDetails = roomTypeDetails;
     }

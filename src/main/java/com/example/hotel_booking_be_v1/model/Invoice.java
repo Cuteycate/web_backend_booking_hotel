@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -32,5 +33,13 @@ public class Invoice {
     @JsonIgnore // Tránh vòng lặp với InvoiceDetail
     private List<InvoiceDetail> details = new ArrayList<>(); // Chi tiết hóa đơn
 
+    @Column
+    private BigDecimal depositAmount; // Tiền trả trước
+
+    @Column
+    private Date paymentDate; // Ngày thanh toán
+
+    @Column
+    private String paymentMethod; // Phương thức thanh toán (VD: VNPay, Cash, etc.)
 }
 

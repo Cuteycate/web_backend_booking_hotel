@@ -5,6 +5,7 @@ import com.example.hotel_booking_be_v1.repository.DistrictRepository;
 import com.example.hotel_booking_be_v1.repository.HotelRepository;
 import com.example.hotel_booking_be_v1.repository.ProvinceRepository;
 import com.example.hotel_booking_be_v1.repository.WardRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SearchService {
 
     @Autowired
@@ -34,25 +36,34 @@ public class SearchService {
 
         // Tìm tỉnh và chuyển đổi thành SearchResultDTO
         provinceRepository.findByNameContaining(query).forEach(province -> {
-            SearchResultDTO dto = new SearchResultDTO("Province", province.getName(), province.getId());
+            // Thêm thông tin bổ sung cho Province
+            SearchResultDTO dto = new SearchResultDTO("Province", province.getName(), province.getId(), null);
             results.add(dto);
         });
 
         // Tìm quận và chuyển đổi thành SearchResultDTO
         districtRepository.findByNameContaining(query).forEach(district -> {
-            SearchResultDTO dto = new SearchResultDTO("District", district.getName(), district.getId());
+            // Thêm thông tin bổ sung cho District (chỉ lấy tên tỉnh)
+            String addition = district.getProvince().getName(); // Chỉ lấy tên tỉnh (thành phố)
+            SearchResultDTO dto = new SearchResultDTO("District", district.getName(), district.getId(), addition);
             results.add(dto);
         });
 
         // Tìm phường và chuyển đổi thành SearchResultDTO
         wardRepository.findByNameContaining(query).forEach(ward -> {
-            SearchResultDTO dto = new SearchResultDTO("Ward", ward.getName(), ward.getId());
+            // Thêm thông tin bổ sung cho Ward (lấy tên tỉnh và quận)
+            String addition = ward.getDistrict().getProvince().getName() + ", " + ward.getDistrict().getName();
+            SearchResultDTO dto = new SearchResultDTO("Ward", ward.getName(), ward.getId(), addition);
             results.add(dto);
         });
 
         // Tìm khách sạn và chuyển đổi thành SearchResultDTO
         hotelRepository.findByNameContaining(query).forEach(hotel -> {
-            SearchResultDTO dto = new SearchResultDTO("Hotel", hotel.getName(), hotel.getId());
+            // Thêm thông tin bổ sung cho Hotel (lấy tên tỉnh, quận và phường)
+            String addition = hotel.getWard().getDistrict().getProvince().getName() + ", "
+                    + hotel.getWard().getDistrict().getName() + ", "
+                    + hotel.getWard().getName();
+            SearchResultDTO dto = new SearchResultDTO("Hotel", hotel.getName(), hotel.getId(), addition);
             results.add(dto);
         });
 

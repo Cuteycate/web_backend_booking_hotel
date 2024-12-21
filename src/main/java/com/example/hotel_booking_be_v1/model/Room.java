@@ -23,6 +23,8 @@ public class Room {
     private String name;
     private BigDecimal roomPrice;
     private int quantity;
+    private BigDecimal depositPercentage; // Ví dụ: 20.0 (tương ứng 20%)
+
 
     @ManyToOne
     @JoinColumn(name = "hotel_id")
@@ -44,4 +46,6 @@ public class Room {
     )
     @JsonIgnore
     private List<RoomFacility> facilities = new ArrayList<>();
+
+
 }

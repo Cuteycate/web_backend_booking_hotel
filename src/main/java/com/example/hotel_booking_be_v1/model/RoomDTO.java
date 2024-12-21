@@ -20,4 +20,5 @@ public class RoomDTO {
     private List<MultipartFile> Photos; // Danh sách ảnh dạng Base64
     @Nullable
     private Integer valid;
+    private BigDecimal depositPercentage;
 }

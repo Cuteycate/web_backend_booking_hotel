@@ -8,7 +8,9 @@ import com.example.hotel_booking_be_v1.service.InvoiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -50,6 +52,15 @@ public class BookingService implements IBookingService  {
         bookingRepository.save(booking);
     }
 
+    @Override
+    public void saveBookingWithInvoice2(Booking booking, BigDecimal depositAmount) {
+        Invoice invoice = invoiceService.createInvoiceForBooking(booking);
+        invoice.setDepositAmount(depositAmount);
+        invoice.setPaymentMethod("VNPAY");
+        invoice.setPaymentDate(new Date());
+        booking.setInvoice(invoice);
+        bookingRepository.save(booking);
+    }
     @Override
     public List<Booking> findOverlappingBookings(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
         return bookingRepository.findBookingsByRoomAndDateRange(roomId, checkInDate, checkOutDate);

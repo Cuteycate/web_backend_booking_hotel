@@ -10,4 +10,5 @@ public class SearchResultDTO {
     private String type; // "Province", "District", "Ward", "Hotel"
     private String name;
     private Long id; // ID của đối tượng
+    private String addition; // Thêm trường này để chứa thông tin bổ sung (như thành phố, quận, phường)
 }

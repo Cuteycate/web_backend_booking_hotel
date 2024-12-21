@@ -33,13 +33,9 @@ public class RoomAvailabilityService {
     private HotelRepository hotelRepository;
 
 
-    public Map<String, Object> getHotelWithAvailableRooms(String hotelName, LocalDate checkInDate, LocalDate checkOutDate) {
+    public Map<String, Object> getHotelWithAvailableRooms(Long hotelId, LocalDate checkInDate, LocalDate checkOutDate) {
 
-        // Bước 0: Tìm hotelId từ hotelName
-        Long hotelId = hotelRepository.findHotelIdByName(hotelName)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy khách sạn với tên: " + hotelName));
 
-        // Bước 1: Lấy danh sách booking trùng với khoảng thời gian
         List<Booking> overlappingBookings = bookingRepository.findOverlappingBookings(hotelId, checkInDate, checkOutDate);
 
         // Bước 2: Đếm số lượng phòng đã được đặt
@@ -87,6 +83,7 @@ public class RoomAvailabilityService {
                         availableQuantity, // Số phòng còn trống
                         room.getRoomType() != null ? room.getRoomType().getName() : "N/A",
                         base64Photos, // Danh sách ảnh Base64
+                        room.getDepositPercentage(),
                         facilityNames, // Tên các tiện nghi
                         room.getFacilities(), // Chi tiết tiện nghi
                         room.getRoomType() // Chi tiết loại phòng

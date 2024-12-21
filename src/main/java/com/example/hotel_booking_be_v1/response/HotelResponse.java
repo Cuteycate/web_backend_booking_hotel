@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -24,6 +25,7 @@ public class HotelResponse {
     private List<String> facilityNames;  // Thêm tiện ích vào đây
     private int ratingCount; // Số lượng đánh giá
     private float starRating; // Xếp hạng sao
+    private BigDecimal cheapestRoomPrice;
 
     public HotelResponse(Long id, String name, String description, String photo, String status, String email, String phoneNumber, String street, String wardName, String districtName, String provinceName) {
         this.id = id;
@@ -54,7 +56,7 @@ public class HotelResponse {
         this.facilityNames = facilityNames;
     }
 
-    public HotelResponse(Long id, String name, String description, String photo, List<String> photos, String status, String email, String phoneNumber, String street, String wardName, String districtName, String provinceName,  List<String> facilityNames, int ratingCount, float starRating ) {
+    public HotelResponse(Long id, String name, String description, String photo, List<String> photos, String status, String email, String phoneNumber, String street, String wardName, String districtName, String provinceName,  List<String> facilityNames, int ratingCount, float starRating ,BigDecimal cheapestRoomPrice ) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -70,6 +72,7 @@ public class HotelResponse {
         this.facilityNames = facilityNames;
         this.ratingCount = ratingCount;
         this.starRating = starRating;
+        this.cheapestRoomPrice = cheapestRoomPrice;
     }
 
 }

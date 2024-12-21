@@ -4,6 +4,7 @@ import com.example.hotel_booking_be_v1.model.Booking;
 import com.example.hotel_booking_be_v1.model.BookingStatus;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -29,5 +30,6 @@ public interface IBookingService {
     int countBookedRooms(Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
 
     void saveBookingWithInvoice(Booking booking);
+    void saveBookingWithInvoice2(Booking booking, BigDecimal depositAmount);
     List<Booking> findOverlappingBookings(Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
 }
