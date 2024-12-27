@@ -11,4 +11,11 @@ public class ReviewDTO {
     private int rating;      // Số sao
     private String content;  // Nội dung đánh giá
     private List<MultipartFile> photos; // Danh sách ảnh tải lên
+
+    public ReviewDTO(int rating, String content, List<MultipartFile> photos, String bookingUser) {
+      this.rating = rating;
+      this.content = content;
+      this.photos = photos;
+    }
+
 }

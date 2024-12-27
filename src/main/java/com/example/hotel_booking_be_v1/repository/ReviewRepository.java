@@ -18,6 +18,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // Lấy tất cả đánh giá của một người dùng (truy vấn thông qua Booking)
     @Query("SELECT r FROM Review r WHERE r.booking.user.id = :userId")
     List<Review> findByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT AVG(r.rating) FROM Review r WHERE r.booking.hotel.id = :hotelId")
+    float calculateAverageRatingByHotelId(@Param("hotelId") Long hotelId);
 }
 
 

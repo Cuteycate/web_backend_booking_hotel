@@ -22,6 +22,8 @@ public class HotelUserDetails implements UserDetails {
     private String email;
     private String password;
     private Collection<GrantedAuthority> authorities;
+    private boolean isEmailVerified; // Thêm trường emailVerified để kiểm tra xem người dùng có xác minh email không
+    private boolean isApproved;
 
     public static HotelUserDetails buildUserDetails(User user){
         List<GrantedAuthority> authorities = user.getRoles()
@@ -32,7 +34,9 @@ public class HotelUserDetails implements UserDetails {
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
-                authorities
+                authorities,
+                user.isEmailVerified(), // Cập nhật trạng thái emailVerified từ User entity
+                user.isApproved()
         );
     }
 
@@ -69,5 +73,13 @@ public class HotelUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    // Phương thức kiểm tra xem email đã được xác minh chưa
+    public boolean isEmailVerified() {
+        return isEmailVerified;
+    }
+    public boolean isApproved() {
+        return isApproved;
     }
 }

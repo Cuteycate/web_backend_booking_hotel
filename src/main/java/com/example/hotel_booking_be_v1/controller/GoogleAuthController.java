@@ -61,6 +61,7 @@ public class GoogleAuthController {
                 Role role = roleRepository.findByName("ROLE_USER")
                         .orElseThrow(() -> new RuntimeException("Role not found"));
                 newUser.setRoles(Set.of(role));
+                newUser.setEmailVerified(true);
                 newUser.setPassword(passwordEncoder.encode("google_oauth"));  // Mật khẩu giả
                 return userRepository.save(newUser);
             });

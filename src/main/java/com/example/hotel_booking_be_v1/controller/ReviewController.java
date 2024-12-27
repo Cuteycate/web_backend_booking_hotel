@@ -2,10 +2,13 @@ package com.example.hotel_booking_be_v1.controller;
 
 import com.example.hotel_booking_be_v1.model.Review;
 import com.example.hotel_booking_be_v1.model.ReviewDTO;
+import com.example.hotel_booking_be_v1.response.ReviewResponse;
 import com.example.hotel_booking_be_v1.service.ReviewService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,9 +27,10 @@ public class ReviewController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addReview(
+            @AuthenticationPrincipal UserDetails userDetails,
             @ModelAttribute ReviewDTO reviewDTO) {
         try {
-            Review review = reviewService.addReview(reviewDTO);
+            Review review = reviewService.addReview(reviewDTO, userDetails);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body("Review added successfully with ID: " + review.getId());
         } catch (Exception e) {
@@ -35,8 +39,8 @@ public class ReviewController {
         }
     }
     @GetMapping("/hotel/{hotelId}")
-    public ResponseEntity<List<Review>> getReviewsByHotel(@PathVariable Long hotelId) {
-        List<Review> reviews = reviewService.findByHotelId(hotelId);
+    public ResponseEntity<List<ReviewResponse>> getReviewsByHotel(@PathVariable Long hotelId) {
+        List<ReviewResponse> reviews = reviewService.findByHotelId(hotelId);
         return ResponseEntity.ok(reviews);
     }
 

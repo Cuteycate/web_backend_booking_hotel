@@ -60,11 +60,14 @@ public class SearchService {
         // Tìm khách sạn và chuyển đổi thành SearchResultDTO
         hotelRepository.findByNameContaining(query).forEach(hotel -> {
             // Thêm thông tin bổ sung cho Hotel (lấy tên tỉnh, quận và phường)
-            String addition = hotel.getWard().getDistrict().getProvince().getName() + ", "
-                    + hotel.getWard().getDistrict().getName() + ", "
-                    + hotel.getWard().getName();
-            SearchResultDTO dto = new SearchResultDTO("Hotel", hotel.getName(), hotel.getId(), addition);
-            results.add(dto);
+            if ("APPROVED".equals(hotel.getStatus())) {
+                // Thêm thông tin bổ sung cho Hotel (lấy tên tỉnh, quận và phường)
+                String addition = hotel.getWard().getDistrict().getProvince().getName() + ", "
+                        + hotel.getWard().getDistrict().getName() + ", "
+                        + hotel.getWard().getName();
+                SearchResultDTO dto = new SearchResultDTO("Hotel", hotel.getName(), hotel.getId(), addition);
+                results.add(dto);
+            }
         });
 
         // Giới hạn kết quả trả về dựa trên độ dài của truy vấn

@@ -48,6 +48,9 @@ public class Booking {
     @JsonIgnore
     private List<Room> rooms; // Danh sách phòng đặt
 
+    @Column(unique = true)
+    private String bookingCode;
+
     @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Review review; // Liên kết tới Review

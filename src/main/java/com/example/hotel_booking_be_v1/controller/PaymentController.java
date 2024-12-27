@@ -142,7 +142,7 @@ public class PaymentController {
                 bookingDTO.setCheckInDate(checkInDate);
                 bookingDTO.setCheckOutDate(checkOutDate);
                 bookingDTO.setNumberOfGuests(numberOfGuests);
-                bookingDTO.setStatus(BookingStatus.PENDING);
+                bookingDTO.setStatus(BookingStatus.DEPOSITED);
 
                 // Create the booking from DTO
                 Booking booking = new Booking();

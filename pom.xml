@@ -27,8 +27,11 @@
 			<version>1.34.1</version> <!-- Kiểm tra phiên bản mới nhất -->
 		</dependency>
 
-		<!-- Google API Client -->
-
+		<!-- Email -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 
 		<!-- Jackson core for JSON parsing -->
 		<dependency>
