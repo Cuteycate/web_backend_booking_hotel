@@ -63,7 +63,10 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/auth/google/**","/rooms/**","/bookings/**", "/login-rental", "/api/bookings/**", "/api/rental/register")
+                        .requestMatchers("/auth/**", "/auth/google/**","/rooms/**","/bookings/**", "/login-rental",
+                                "/api/bookings/**", "/api/rental/register", "/api/search/autocomplete", "/api/hotels/**",
+                        "/hotels/by-ward/**", "/hotels/by-district/**", "/hotels/by-province/**", "/hotels/hotels/**",
+                                "/reviews/hotel/**")
                         .permitAll()
                         .requestMatchers("/roles/**","/api/rental/approve/**")
                         .hasRole("ADMIN")

@@ -16,6 +16,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import javax.sql.rowset.serial.SerialBlob;
@@ -41,9 +43,22 @@ public class RoomController {
     private final RoomFacilityService roomFacilityService;
     private final RoomRepository roomRepository;
     private final RoomPhotoRepository roomPhotoRepository;
+    private final UserService userService;
 
     @GetMapping("/{hotelId}")
-    public ResponseEntity<List<RoomResponse>> getRoomsByHotelId(@PathVariable Long hotelId) {
+    public ResponseEntity<List<RoomResponse>> getRoomsByHotelId(@PathVariable Long hotelId,
+                                                                @AuthenticationPrincipal UserDetails userDetails) {
+
+        // Lấy email của người dùng hiện tại từ UserDetails
+        String email = userDetails.getUsername();
+        User user = userService.getUserByEmail(email);
+
+        // Kiểm tra người dùng có quyền xem thông tin khách sạn không
+        Hotel hotel = hotelService.getHotelById1(hotelId); // Giả sử có hàm này
+        if (hotel == null || !hotel.getOwner().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // HTTP 403
+        }
+
         // Lấy danh sách phòng theo hotelId
         List<Room> rooms = roomService.getRoomsByHotelsId(hotelId);
 
@@ -135,9 +150,19 @@ public class RoomController {
     }
 
     @GetMapping("update/{roomId}")
-    public ResponseEntity<RoomResponse> getRoom(@PathVariable Long roomId) {
+    public ResponseEntity<RoomResponse> getRoom(@PathVariable Long roomId,
+                                                @AuthenticationPrincipal UserDetails userDetails) {
         try {
+            // Lấy email của người dùng hiện tại từ UserDetails
+            String email = userDetails.getUsername();
+            User user = userService.getUserByEmail(email);
+
+            // Kiểm tra người dùng có quyền xem thông tin khách sạn không
             Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+            if (room == null || !room.getHotel().getOwner().getId().equals(user.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // HTTP 403
+            }
+
 
             // Hiển thị thông tin phòng hiện tại cho người dùng
             RoomResponse currentRoomResponse = new RoomResponse(

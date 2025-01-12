@@ -2,7 +2,9 @@ package com.example.hotel_booking_be_v1.controller;
 
 import com.example.hotel_booking_be_v1.exception.UserAlreadyExistsException;
 import com.example.hotel_booking_be_v1.model.ChangePasswordRequest;
+import com.example.hotel_booking_be_v1.model.EmailVerificationToken;
 import com.example.hotel_booking_be_v1.model.User;
+import com.example.hotel_booking_be_v1.repository.EmailVerificationTokenRepository;
 import com.example.hotel_booking_be_v1.request.LoginRequest;
 import com.example.hotel_booking_be_v1.response.JwtResponse;
 import com.example.hotel_booking_be_v1.security.HotelUserDetails;
@@ -23,8 +25,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -33,6 +39,7 @@ public class AuthController {
     private final IUserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final EmailVerificationTokenRepository tokenRepository;
 
     @PostMapping("/register-user")
     public ResponseEntity<?> registerUser(@RequestBody User user){
@@ -148,7 +155,7 @@ public class AuthController {
         try {
             userService.verifyEmail(token); // Xác minh email với token
             response.setStatus(HttpServletResponse.SC_FOUND); // HTTP 302: Chuyển hướng
-            response.setHeader("Location", "http://localhost:5173"); // Địa chỉ trang FE
+            response.setHeader("Location", "http://localhost:5173/login?message=Email verified successfully"); // Địa chỉ trang FE
         } catch (RuntimeException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // HTTP 400
         }
@@ -169,6 +176,47 @@ public class AuthController {
             return ResponseEntity.ok("Mật khẩu đã được thay đổi thành công!");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam("email") String email) {
+        try {
+            userService.sendPasswordResetEmail(email);
+            return ResponseEntity.ok("Password reset email sent successfully.");
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
+    }
+
+    // Endpoint thay đổi mật khẩu
+    @GetMapping("/reset-password")
+    public RedirectView verifyTokenAndRedirect(@RequestParam("token") String token) {
+        // Kiểm tra token có hợp lệ không
+        EmailVerificationToken verificationToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired token"));
+
+        // Kiểm tra token có hết hạn không
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token has expired");
+        }
+
+        // Nếu token hợp lệ, thực hiện chuyển hướng tới URL frontend
+        String frontendResetPasswordUrl = "http://localhost:5173/reset-password?token=" + token;
+
+        // Trả về RedirectView để chuyển hướng người dùng
+        RedirectView redirectView = new RedirectView();
+        redirectView.setUrl(frontendResetPasswordUrl);
+        return redirectView;
+    }
+    @PostMapping("/password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String newPassword = request.get("newPassword");
+        try {
+            userService.resetPassword(token, newPassword);
+            return ResponseEntity.ok("Password reset successfully.");
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }
 

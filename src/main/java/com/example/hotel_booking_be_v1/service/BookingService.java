@@ -14,10 +14,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -121,29 +118,52 @@ public class BookingService implements IBookingService  {
     @Override
     public List<BookingResponse> getBookingsByHotelOwnerId(Long ownerId) {
         List<Object[]> rawBookings = bookingRepository.findBookingsByHotelOwnerId(ownerId);
-        List<BookingResponse> bookings = new ArrayList<>();
 
-        rawBookings.forEach(record -> {
-            BookingResponse booking = new BookingResponse();
-            booking.setBookingId((Long) record[0]);
-            booking.setCheckInDate((LocalDate) record[1]);
-            booking.setCheckOutDate((LocalDate) record[2]);
-            booking.setStatus((BookingStatus) record[3]); // Gán status
-            booking.setEmail((String) record[4]);
-            booking.setName((String) record[5]);
-            booking.setHotelName((String) record[6]);
-            booking.getRoomNames().add((String) record[7]);
+        // Sử dụng Map để nhóm dữ liệu theo bookingId
+        Map<Long, BookingResponse> bookingMap = new LinkedHashMap<>();
 
-            // Thêm thông tin hóa đơn
-            booking.setTotalPrice((BigDecimal) record[8]);
-            booking.setDepositAmount((BigDecimal) record[9]);
-            booking.setPaymentDate((Date) record[10]);
-            booking.setPaymentMethod((String) record[11]);
+        for (Object[] rawBooking : rawBookings) {
+            Long bookingId = (Long) rawBooking[0];
 
-            bookings.add(booking);
-        });
+            // Nếu bookingId đã tồn tại trong map, chỉ thêm roomName vào
+            if (bookingMap.containsKey(bookingId)) {
+                BookingResponse existingBooking = bookingMap.get(bookingId);
+                String roomName = (String) rawBooking[7];
+                if (roomName != null) {
+                    existingBooking.getRoomNames().add(roomName);
+                }
+            } else {
+                // Nếu bookingId chưa tồn tại, tạo mới BookingResponse
+                BookingResponse booking = new BookingResponse();
+                booking.setBookingId(bookingId);
+                booking.setCheckInDate((LocalDate) rawBooking[1]);
+                booking.setCheckOutDate((LocalDate) rawBooking[2]);
+                booking.setStatus((BookingStatus) rawBooking[3]);
+                booking.setEmail((String) rawBooking[4]);
+                booking.setName((String) rawBooking[5]);
+                booking.setHotelName((String) rawBooking[6]);
 
-        return bookings;
+                // Thêm tên phòng (nếu có)
+                List<String> roomNames = new ArrayList<>();
+                String roomName = (String) rawBooking[7];
+                if (roomName != null) {
+                    roomNames.add(roomName);
+                }
+                booking.setRoomNames(roomNames);
+
+                // Thêm thông tin hóa đơn
+                booking.setTotalPrice((BigDecimal) rawBooking[8]);
+                booking.setDepositAmount((BigDecimal) rawBooking[9]);
+                booking.setPaymentDate((Date) rawBooking[10]);
+                booking.setPaymentMethod((String) rawBooking[11]);
+
+                // Lưu vào map
+                bookingMap.put(bookingId, booking);
+            }
+        }
+
+        // Trả về danh sách BookingResponse từ Map
+        return new ArrayList<>(bookingMap.values());
     }
 
     public List<BookingResponse> getAllBookings() {

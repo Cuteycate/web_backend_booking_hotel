@@ -30,6 +30,7 @@ public class BookingController {
     private final IUserService userService;
     private final IHotelService hotelService;
     private final BookingRepository bookingRepository;
+    private final EmailService emailService;
 
 
     @PostMapping("/add")
@@ -122,7 +123,7 @@ public class BookingController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error: " + e.getMessage());
         }
-    }
+    }   
     @GetMapping("/user")
     public ResponseEntity<List<BookingResponse>> getBookingsByUser(@AuthenticationPrincipal UserDetails userDetails) {
         // Lấy email từ userDetails
@@ -268,6 +269,18 @@ public class BookingController {
                 // Cập nhật trạng thái booking thành CONFIRMED
                 booking.setStatus(BookingStatus.CONFIRMED);
                 bookingRepository.save(booking);
+                // Gửi email xác nhận
+                String customerEmail = booking.getUser().getEmail(); // Lấy email người đã booking
+                String subject = "Booking Confirmed!";
+                String message = String.format(
+                        "Dear %s,\n\nYour booking with ID %d at %s has been confirmed successfully. We look forward to welcoming you.\n\nBest regards,\n%s",
+                        booking.getUser().getFirstName(),
+                        booking.getId(),
+                        hotel.getName(),
+                        hotel.getOwner().getFirstName()
+                );
+
+                emailService.sendMail(customerEmail, subject, message);
                 return ResponseEntity.status(HttpStatus.OK).body("Booking confirmed successfully!");
             } else {
                 // Trả về lỗi nếu trạng thái không phải PENDING hoặc DEPOSITED

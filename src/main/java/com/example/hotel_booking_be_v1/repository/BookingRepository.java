@@ -68,7 +68,7 @@ public interface BookingRepository extends JpaRepository<Booking,Long> {
        JOIN b.hotel h
        JOIN h.owner ho
        JOIN b.user u
-       JOIN b.rooms r
+       LEFT JOIN b.rooms r
        LEFT JOIN b.invoice i
        WHERE ho.id = :ownerId
        """)

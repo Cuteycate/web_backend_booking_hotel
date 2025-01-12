@@ -92,6 +92,70 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating booking.");
         }
     }
+
+
+    @PostMapping("/payFull")
+    public ResponseEntity<?> payFullBooking(@AuthenticationPrincipal UserDetails userDetails,
+                                            @ModelAttribute BookingDTO bookingDTO,
+                                            @RequestParam BigDecimal totalRoomAmount,
+                                            HttpServletRequest request) {
+        try {
+            // Lấy email từ userDetails
+            String email = userDetails.getUsername();
+
+            // Step 1: Kiểm tra logic check-in, check-out
+            long days = ChronoUnit.DAYS.between(bookingDTO.getCheckInDate(), bookingDTO.getCheckOutDate());
+            if (days <= 0) {
+                throw new IllegalArgumentException("Check-out date must be after check-in date.");
+            }
+
+            List<Long> roomIds = bookingDTO.getRoomIds();
+            Map<Long, Room> roomMap = roomService.getRoomByIds(roomIds);
+
+
+            // Step 2: Calculate the total deposit amount
+            BigDecimal totalDepositAmount = BigDecimal.ZERO;
+
+            for (Long roomId : roomIds) {
+                Room room = roomMap.get(roomId);  // Get room by ID
+                if (room != null) {
+                    // Kiểm tra nếu depositPercentage không null
+                    if (room.getDepositPercentage() != null) {
+                        // Calculate the deposit amount for this room
+                        BigDecimal depositAmountForRoom = room.getDepositPercentage()
+                                .multiply(room.getRoomPrice())  // Deposit = depositPercentage * roomPrice
+                                .multiply(BigDecimal.valueOf(days));
+                        totalDepositAmount = totalDepositAmount.add(depositAmountForRoom);
+                    } else {
+                        // Nếu không có depositPercentage, bỏ qua phòng này
+                        System.out.println("Room ID " + roomId + " does not have a depositPercentage, skipping.");
+                    }
+                }
+            }
+
+            if (totalRoomAmount.compareTo(totalDepositAmount) < 0) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "status", "FAILED",
+                        "message", "Total payment amount must be greater than or equal to the deposit amount."
+                ));
+            }
+
+            // Step 2: Truyền thẳng totalRoomAmount làm số tiền thanh toán
+            String paymentUrl = vnPayService.createPaymentUrl(request, totalRoomAmount.longValue(), bookingDTO, email);
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "PENDING",
+                    "message", "Booking created with full payment. Please proceed with payment.",
+                    "paymentUrl", paymentUrl
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating full payment booking.");
+        }
+    }
+
+
+
     @GetMapping("/payment/vnpay-return")
     public RedirectView handlePaymentReturn(HttpServletRequest request) {
         Map<String, String> response = new HashMap<>();
@@ -207,7 +271,12 @@ public class PaymentController {
                 bookingService.saveBookingWithInvoice2(booking, depositAmount);
 
                 // Chuyển hướng sang trang thanh toán thành công
-                return new RedirectView("http://localhost:5173");
+                String redirectUrl = "http://localhost:5173" +
+                        "?checkInDate=" + booking.getCheckInDate() +
+                        "&checkOutDate=" + booking.getCheckOutDate() +
+                        "&depositAmount=" + depositAmount;
+
+                return new RedirectView(redirectUrl);
 
             } else {
                 // Trả về phản hồi thất bại nếu mã phản hồi không phải "00"

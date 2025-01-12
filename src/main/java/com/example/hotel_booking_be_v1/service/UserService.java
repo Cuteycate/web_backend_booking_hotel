@@ -10,9 +10,11 @@ import com.example.hotel_booking_be_v1.repository.UserRepository;
 import com.example.hotel_booking_be_v1.response.UserResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -52,12 +54,66 @@ public class UserService implements IUserService{
                 "Please click the link below to verify your email:\n\n" + verificationLink + "\n\n" +
                 "This link will expire in 24 hours.\n\n" +
                 "Best regards,\n" +
-                "Your Team";
+                "Booking Hotel";
 
         emailService.sendMail(savedUser.getEmail(), subject, body);
 
         return savedUser;
     }
+
+    // Gửi email quên mật khẩu
+    public void sendPasswordResetEmail(String email) {
+        // Tìm người dùng theo email
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with email: " + email));
+
+        // Tạo token quên mật khẩu
+        String token = UUID.randomUUID().toString();
+
+        // Tạo đối tượng EmailVerificationToken
+        EmailVerificationToken verificationToken = new EmailVerificationToken();
+        verificationToken.setToken(token);
+        verificationToken.setUser(user);
+        verificationToken.setExpiryDate(LocalDateTime.now().plusHours(24)); // Token hết hạn sau 24 giờ
+
+        // Lưu token vào cơ sở dữ liệu
+        tokenRepository.save(verificationToken);
+
+        // Tạo đường dẫn reset mật khẩu
+        String resetLink = "http://localhost:8080/auth/reset-password?token=" + token;
+        String subject = "Password Reset Request";
+        String body = "Hi " + user.getFirstName() + ",\n\n" +
+                "Please click the link below to reset your password:\n\n" + resetLink + "\n\n" +
+                "This link will expire in 24 hours.\n\n" +
+                "Best regards,\n" +
+                "Your Team";
+
+        // Gửi email cho người dùng
+        emailService.sendMail(user.getEmail(), subject, body);
+    }
+
+    // Đổi mật khẩu khi nhận được token hợp lệ
+    public void resetPassword(String token, String newPassword) {
+        // Kiểm tra token có hợp lệ không
+        EmailVerificationToken verificationToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired token"));
+
+        // Kiểm tra xem token có hết hạn chưa
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token has expired");
+        }
+
+        // Lấy người dùng từ token
+        User user = verificationToken.getUser();
+
+        // Mã hóa mật khẩu mới và cập nhật vào user
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        // Xóa token sau khi sử dụng (tuỳ chọn)
+        tokenRepository.delete(verificationToken);
+    }
+
 
     @Override
     public List<User> getUsers() {

@@ -15,4 +15,7 @@ public interface IUserService {
     boolean verifyEmail(String token);
     void changePassword(Long userId, String oldPassword, String newPassword);
     UserResponse getUserResponse(Long userId);
+    public void sendPasswordResetEmail(String email);
+    public void resetPassword(String token, String newPassword);
 }
+
