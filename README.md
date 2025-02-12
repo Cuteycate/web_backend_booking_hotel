@@ -1,4 +1,4 @@
-# Booking Application
+![image](https://github.com/user-attachments/assets/03b4a663-13af-451f-bdc9-4183d95795b4)# Booking Application
 
 ## Description
 This Booking Application is a web platform that allows users to book hotels online. Built with **Spring Boot** for the backend and **React + Vite** for the frontend, the application enables users to search for hotels, make reservations, and manage bookings seamlessly.
@@ -67,7 +67,8 @@ Below are some screenshots showcasing key features:
 
 ### Homepage:
 
-![Homepage](#)
+![Homepage](![image](https://github.com/user-attachments/assets/ff93ee46-9a0c-49c0-af9f-55e107c51b9e)
+)
 
 ### Hotel Search:
 
