@@ -67,7 +67,7 @@ Below are some screenshots showcasing key features:
 
 ### Homepage:
 
-![Homepage](![image](https://github.com/user-attachments/assets/ff93ee46-9a0c-49c0-af9f-55e107c51b9e)
+![Homepage](https://github.com/user-attachments/assets/ff93ee46-9a0c-49c0-af9f-55e107c51b9e)
 )
 
 ### Hotel Search:
