@@ -93,9 +93,16 @@ Below are some screenshots showcasing key features:
 
 
 
-### Booking Process:
 
-![Booking](#)
+
+
+### Booking Process:
+#### Real-Time Room Availability Check  
+- Each room type has a **maximum booking capacity of 4 guests**.  
+- The system will display the **real-time availability** of rooms.  
+- If a room type is **fully booked**, it will **no longer be shown** in the search results.
+#### Real-Time Room Availability Check
+![Real-Time Room Availability Check](https://github.com/user-attachments/assets/5bd96b22-3fd7-41a5-a6a2-e0e95e1f12f0)
 
 ### Payment Integration (Online Deposit/Full Payment):
 
