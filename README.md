@@ -110,11 +110,12 @@ Below are some screenshots showcasing key features:
 
 
 - If a **deposit is required**, users must either **pay the deposit** or **pay the full amount** to complete the booking.
-![pay the deposit](https://github.com/user-attachments/assets/ed0a0ada-1249-49d5-954a-737290f36c9f)
+![pay the deposi](https://github.com/user-attachments/assets/46830e26-2f36-4495-9ba5-ec6057ccfed7)
 
 
-#### Payment 
-![Payment](https://github.com/user-attachments/assets/f135946f-0d3e-4cdb-a56f-b288ce4b3408)
+
+#### Payment
+![Payment](https://github.com/user-attachments/assets/ed0a0ada-1249-49d5-954a-737290f36c9f)
 ![Payment Success](https://github.com/user-attachments/assets/2463b0a5-ea76-4172-8d61-b2e07b777180)
 
 
