@@ -83,8 +83,15 @@ Below are some screenshots showcasing key features:
 
 
 ### Hotel Search:
+#### Location-Based Search
+![Location-Based Search1](https://github.com/user-attachments/assets/bdbf259f-9d47-468f-9559-041173c91284)
+![Location-Based Search2](https://github.com/user-attachments/assets/94c2677c-4823-4c65-a716-686c61c67e32)
 
-![Hotel Search](#)
+#### Hotel Name Search
+![Hotel Name Search1](https://github.com/user-attachments/assets/2c8fdd12-1351-4ee4-a0b5-81ef3b93df40)
+![Hotel Name Search2](https://github.com/user-attachments/assets/135fa184-c080-4a87-b528-0bab8d219edd)
+
+
 
 ### Booking Process:
 
