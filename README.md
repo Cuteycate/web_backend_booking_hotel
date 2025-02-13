@@ -1,4 +1,4 @@
-# Booking Application
+![image](https://github.com/user-attachments/assets/af27925a-a5ee-43e3-a976-06d2fcea0fec)![image](https://github.com/user-attachments/assets/0f605822-e66c-4a67-ab5e-7b829c595ef8)# Booking Application
 
 ## Description
 This Booking Application is a web platform that allows users to book hotels online. Built with **Spring Boot** for the backend and **React + Vite** for the frontend, the application enables users to search for hotels, make reservations, and manage bookings seamlessly.
@@ -101,16 +101,29 @@ Below are some screenshots showcasing key features:
 - Each room type has a **maximum booking capacity of 4 guests**.  
 - The system will display the **real-time availability** of rooms.  
 - If a room type is **fully booked**, it will **no longer be shown** in the search results.
-#### Real-Time Room Availability Check
+
 ![Real-Time Room Availability Check](https://github.com/user-attachments/assets/5bd96b22-3fd7-41a5-a6a2-e0e95e1f12f0)
 
 ### Payment Integration (Online Deposit/Full Payment):
+#### Payment Rules  
+- If **no deposit is required**, users can either **book immediately** or **pay in full**.
 
-![Payment](#)
+
+- If a **deposit is required**, users must either **pay the deposit** or **pay the full amount** to complete the booking.
+![pay the deposit](https://github.com/user-attachments/assets/ed0a0ada-1249-49d5-954a-737290f36c9f)
+
+
+#### Payment 
+![Payment](https://github.com/user-attachments/assets/f135946f-0d3e-4cdb-a56f-b288ce4b3408)
+![Payment Success](https://github.com/user-attachments/assets/2463b0a5-ea76-4172-8d61-b2e07b777180)
+
+
+
 
 ### Email Confirmation:
 
-![Email Confirmation](#)
+![Email Confirmation](https://github.com/user-attachments/assets/47e966ae-55d8-423e-809c-e9dab6ff0755)
+
 
 ### Admin Dashboard:
 
