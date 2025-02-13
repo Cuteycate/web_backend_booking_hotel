@@ -1,4 +1,4 @@
-# Booking Application
+![image](https://github.com/user-attachments/assets/13abe1ab-6173-4354-baaf-960529f62765)# Booking Application
 
 ## Description
 This Booking Application is a web platform that allows users to book hotels online. Built with **Spring Boot** for the backend and **React + Vite** for the frontend, the application enables users to search for hotels, make reservations, and manage bookings seamlessly.
@@ -128,14 +128,56 @@ Below are some screenshots showcasing key features:
 
 ### Admin Dashboard:
 
-![Admin Dashboard](#)
+![image](https://github.com/user-attachments/assets/b42136e4-46dd-4206-bf82-297ba73ab005)
+![image](https://github.com/user-attachments/assets/1735190e-4494-4506-8735-4e1f3d9860be)
+![image](https://github.com/user-attachments/assets/14b193dd-32bf-4e06-8c4b-86f56487b89f)
+![image](https://github.com/user-attachments/assets/488616b3-aede-4164-89e7-b44664212a2e)
+![image](https://github.com/user-attachments/assets/90bf42f5-754a-47bc-b690-51e5a20bcd3b)
+![image](https://github.com/user-attachments/assets/ce994a18-fe8b-44e2-a569-4071bbe2b0c5)
+![image](https://github.com/user-attachments/assets/90b18015-c52c-4582-8305-7063ab6e92f2)
+
+
+
+
 
 ### Rental Management:
 
-![Rental Management](#)
+#### Hotel Registration & Approval  
+- Rentals can **register a hotel** and wait for **admin approval**.  
+- Once approved, they can **manage and edit** their hotel details.
+![image](https://github.com/user-attachments/assets/ba5c00ef-3832-45ea-882f-cf52d70f2050)
+![image](https://github.com/user-attachments/assets/e66df97e-ff58-4dc8-af25-07acc045939e)
+![image](https://github.com/user-attachments/assets/64a7fb1a-9b39-4c0f-a8ec-6704b780a1cd)
+![image](https://github.com/user-attachments/assets/6481e8dd-b84d-4378-ad31-f09215497b89)
+
+
+
+
+
+#### Room Management  
+- Rentals can **add new rooms** to their hotel.  
+- They can also **edit and update** room details.
+![image](https://github.com/user-attachments/assets/579832db-c774-4201-91ba-fd70971cf7c3)
+![image](https://github.com/user-attachments/assets/3d02c320-db76-452e-94ac-f6ef631c5e37)
+![image](https://github.com/user-attachments/assets/9ab1135e-eb80-4765-acd3-859bca403b19)
+
+
+
+
+#### Booking Management  
+- Rentals can **manage user bookings** and **confirm reservations**.  
+- They can also **assist users with check-in** using the **booking code**.
+![image](https://github.com/user-attachments/assets/d5ded13d-2591-43cb-8f7f-283276a1f7c8)
+![image](https://github.com/user-attachments/assets/cc754f6a-b045-4bd9-83ac-b169f08c1aeb)
+![image](https://github.com/user-attachments/assets/5d90c970-2924-4319-bf9f-b88e97dd9081)
+
+
+
 
 ## Credits
-- **[Your Name]** - Fullstack Developer
+- **[Hoàng Châu Phúc Thuận]** - Fullstack Developer
+- **[Duy]** - Helper
+- **[Nam]** - Helper
 
 ## Features
 - **JWT Authentication** for secure API requests.
