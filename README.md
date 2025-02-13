@@ -69,6 +69,9 @@ Below are some screenshots showcasing key features:
 
 ![Homepage](https://github.com/user-attachments/assets/ff93ee46-9a0c-49c0-af9f-55e107c51b9e)
 ![Login](https://github.com/user-attachments/assets/e7fb170a-86f6-4533-9b0a-bd6d55d26d6b)
+![Register](https://github.com/user-attachments/assets/032cfa94-9259-4fbe-97ed-e718ab9f7c11)
+![Forgot Password](https://github.com/user-attachments/assets/32b33fc9-7ead-4e72-b7ff-fbe201971009)
+
 
 
 ### Hotel Search:
