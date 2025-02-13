@@ -76,8 +76,8 @@ Below are some screenshots showcasing key features:
 #### Forgot Password:
 ![Forgot Password](https://github.com/user-attachments/assets/32b33fc9-7ead-4e72-b7ff-fbe201971009)
 #### Reset Password Email
-<img width="960" alt="Untitled" src="https://github.com/user-attachments/assets/fc11131e-46ab-4bcf-9075-8450c6a88a46" />
-![Reset Password Email](https://github.com/user-attachments/assets/a19f6dff-355e-4c0a-82b4-3b3ab311c94d)
+![Reset Password Email1](https://github.com/user-attachments/assets/fc11131e-46ab-4bcf-9075-8450c6a88a46)
+![Reset Password Email2](https://github.com/user-attachments/assets/a19f6dff-355e-4c0a-82b4-3b3ab311c94d)
 
 
 
