@@ -120,31 +120,28 @@ public class AuthController {
     public ResponseEntity<?> authenticatedRenter(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        HotelUserDetails userDetails = (HotelUserDetails) authentication.getPrincipal();
+        ); //1
+        SecurityContextHolder.getContext().setAuthentication(authentication); //2
+        HotelUserDetails userDetails = (HotelUserDetails) authentication.getPrincipal(); //3
 
         // Kiểm tra nếu người dùng có vai trò "RENTAL"
-        boolean isRenter = userDetails.getAuthorities().stream()
+        boolean isRenter = userDetails.getAuthorities().stream() //4
                 .anyMatch(role -> role.getAuthority().equals("ROLE_RENTAL"));
-
-        if (!isRenter) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Chỉ rental mới có quyền truy cập.");
+         if (!isRenter) { //5
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Chỉ rental mới có quyền truy cập.");    //7
         }
-
         // Kiểm tra nếu tài khoản rental đã được xác nhận
-        if (!userDetails.isApproved()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tài khoản rental chưa được xác nhận.");
+        if (!userDetails.isApproved()) { //6
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tài khoản rental chưa được xác nhận.");        //9
         }
-
         // Generate token if the user is a renter and has been approved
-        String jwt = jwtUtils.generateJwtTokenForUser(authentication);
+        String jwt = jwtUtils.generateJwtTokenForUser(authentication);      //8
         List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
-                .toList();
+                .toList();          //10
 
-        return ResponseEntity.ok(new JwtResponse(
+        return ResponseEntity.ok(new JwtResponse(       //11
                 userDetails.getId(),
                 userDetails.getEmail(), jwt, roles
         ));
@@ -169,7 +166,7 @@ public class AuthController {
             // Lấy email từ UserDetails
             String email = userDetails.getUsername();
 
-            User user = userService.getUserByEmail(email);
+            User user = userService.    getUserByEmail(email);
             // Gọi service để đổi mật khẩu
             userService.changePassword(user.getId(), request.getOldPassword(), request.getNewPassword());
 
